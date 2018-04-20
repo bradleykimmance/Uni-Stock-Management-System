@@ -1,0 +1,12 @@
+<% include partials/header %>
+
+<h1>This is the User Homepage</h1>
+
+<% users.forEach(function(users){ %>
+    <div>
+        <h4><%= users.name %></h4>
+        <p><%= users.town %></p>
+    </div>
+<% }); %>
+
+<% include partials/footer %>
