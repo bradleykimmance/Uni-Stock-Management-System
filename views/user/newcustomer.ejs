@@ -1,0 +1,11 @@
+<% include ../partials/header %>
+
+<h1>Create a New Customer</h1>
+
+<form action="/customers" method="POST">
+    <input type="text" name = "name" placeholder="name">
+    <input type="text" name = "town" placeholder="town">
+    <button>Submit!</button>
+</form>
+
+<% include ../partials/footer %>
