@@ -26,6 +26,7 @@ a, a:hover, a:focus {
     display: block;
     text-align:center;
 }
+
 #sidebar ul li a:hover {
     color: #7386D5;
     background: #fff;
@@ -38,4 +39,14 @@ a, a:hover, a:focus {
 
 .copyright{
     text-align:center;
+}
+
+.logout{
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+}
+
+.logout:hover{
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    color: #d6d6d6;
 }
