@@ -1,14 +1,26 @@
 <% include ../partials/header %>
 
-<h1>These are the customers</h1>
+<div class="container">
+    <header class="jumbotron">
+        <div class="container">
+            <h1>Customer List</h1>
+            <p>
+                <a class = "btn btn-primary btn-large" href ="/customers/new">Add New Customer</a>
+            </p>
+        </div>
+    </header>
 
-<a href ="/customers/new">Add New Customer</a>
-
-<% customers.forEach(function(customers){ %>
-    <div>
-        <h4><%= customers.name %></h4>
-        <p><%= customers.town %></p>
+    <div class="row">
+        <% customers.forEach(function(customers){ %>
+        <div class="col-md-3 col-sm-6">
+            <div class="thumbnail">
+                <h4><%= customers.name %></h4>
+                <p><%= customers.town %></p>
+            </div>
+        </div>
+        <% }); %>
     </div>
-<% }); %>
+
+</div>
 
 <% include ../partials/footer %>
