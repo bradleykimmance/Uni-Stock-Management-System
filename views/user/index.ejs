@@ -5,8 +5,8 @@
     <nav id="sidebar">
         <!-- Sidebar Links -->
         <ul class="list-unstyled components">
-            <li class="active"><a href="#">Dashboard</a></li>
-            <li><a href="#">Customers</a></li>
+            <li class="active"><a href="/user">Dashboard</a></li>
+            <li><a href="/customers">Customers</a></li>
             <li><a href="#">Stock</a></li>
             <li><a href="#">Invoices</a></li>
             <li><a href="#">Credit Notes</a></li>
@@ -15,19 +15,22 @@
         </ul>
     </nav>
 
-    <div class="container pageContent">
+    <div class="container">
         <header class="jumbotron">
-            <h1>Welcome</h1>
-        </header>
-        <% customers.forEach(function(customers){ %>
-            <div>
-                <h4><%= customers.name %></h4>
-                <p><%= customers.town %></p>
+            <div class="container">
+                <h1>Welcome</h1>
             </div>
-        <% }); %>
-
-        <a href="/customers">Go To Customers</a>
+        </header>
+        <div class="row">
+            <% customers.forEach(function(customers){ %>
+            <div class="col-md-3 col-sm-6">
+                <div class="thumbnail">
+                    <h4><%= customers.name %></h4>
+                    <p><%= customers.town %></p>
+                </div>
+            </div>
+            <% }); %>
+        </div>
     </div>
-</div>
 
 <% include ../partials/footer %>

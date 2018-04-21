@@ -1,21 +1,42 @@
 <% include ../partials/header %>
 
-<h1>Create a New Customer</h1>
+<div class="wrapper">
 
-<form action="/customers" method="POST">
-    <input type="text" name = "customerBusiness" placeholder="Business Name">
-    <input type="text" name = "customerAddress1" placeholder="Address Line 1">
-    <input type="text" name = "customerAddress2" placeholder="Address Line 2">
-    <input type="text" name = "customerAddress3" placeholder="Address Line 3">
-    <input type="text" name = "customerCountry" placeholder="Country">
-    <input type="text" name = "customerNumber" placeholder="Business Number">
-    <input type="text" name = "customerVAT" placeholder="VAT Number">
-    <input type="text" name = "customerEmail" placeholder="Email">
-    <input type="text" name = "customerEmailCC" placeholder="CC Email">
-    <input type="text" name = "customerPhone" placeholder="Phone Number">
-    <button>Submit!</button>
-</form>
+    <nav id="sidebar">
+        <!-- Sidebar Links -->
+        <ul class="list-unstyled components">
+            <li><a href="/user">Dashboard</a></li>
+            <li class="active"><a href="/customers">Customers</a></li>
+            <li><a href="#">Stock</a></li>
+            <li><a href="#">Invoices</a></li>
+            <li><a href="#">Credit Notes</a></li>
+            <li><a href="#">Offers</a></li>
+            <li><a href="#">Reports</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <header class="jumbotron">
+            <div class="container">
+                <h1>Create a new Customer</h1>
+            </div>
+        </header>
 
-<a href="/customers">Go Back</a>
+
+    <form action="/customers" method="POST">
+        <input type="text" name = "customerBusiness" placeholder="Business Name">
+        <input type="text" name = "customerAddress1" placeholder="Address Line 1">
+        <input type="text" name = "customerAddress2" placeholder="Address Line 2">
+        <input type="text" name = "customerAddress3" placeholder="Address Line 3">
+        <input type="text" name = "customerCountry" placeholder="Country">
+        <input type="text" name = "customerNumber" placeholder="Business Number">
+        <input type="text" name = "customerVAT" placeholder="VAT Number">
+        <input type="text" name = "customerEmail" placeholder="Email">
+        <input type="text" name = "customerEmailCC" placeholder="CC Email">
+        <input type="text" name = "customerPhone" placeholder="Phone Number">
+        <button>Submit!</button>
+    </form>
+
+    <a href="/customers">Go Back</a>
+    </div>
 
 <% include ../partials/footer %>

@@ -20,7 +20,6 @@ app.get("/", function(req, res){
 
 // User Homepage
 app.get("/user", function(req, res) {
-
     res.render("user/index", {customers:customers});
 });
 
