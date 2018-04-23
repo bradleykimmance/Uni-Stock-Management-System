@@ -1,4 +1,5 @@
 //Frameworks and Libraries
+var LocalStrategy   = require('passport-local').Strategy;
 var express = require("express");
 var mysql = require("mysql");
 var app = express();
@@ -22,6 +23,51 @@ db.connect(function(err){
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+
+module.exports = function(passport) {
+
+    // Passport setup
+    // Serialize User
+    passport.serializeUser(function(user, done) {
+        done(null, user.id);
+    });
+
+    // Deserialize Use
+    passport.deserializeUser(function(id, done) {
+        connection.query("select * from users where id = "+id,function(err,rows){
+            done(err, rows[0]);
+        });
+    });
+
+    //Passport Login
+    passport.use('local-login', new LocalStrategy({
+            usernameField : 'email',
+            passwordField : 'password',
+            passReqToCallback : true
+        },
+        function(req, email, password, done) { // Callback with email and password
+
+            connection.query("SELECT * FROM `account` WHERE `email` = '" + email + "'",function(err,rows){
+                if (err)
+                    return done(err);
+                if (!rows.length) {
+                    return done(null, false, req.flash('loginMessage', 'No user found.'));
+                }
+
+                // Wrong Password
+                if (!( rows[0].password == password))
+                    return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+
+                // Password Correct
+                return done(null, rows[0]);
+
+            });
+
+
+
+        }));
+
+};
 
 //Homepage / Login
 app.get("/", function(req, res){
