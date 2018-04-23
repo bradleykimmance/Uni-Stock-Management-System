@@ -5,8 +5,8 @@
     <nav id="sidebar">
         <!-- Sidebar Links -->
         <ul class="list-unstyled components">
-            <li><a href="/user">Dashboard</a></li>
-            <li class="active"><a href="/customers">Customers</a></li>
+            <li class="active"><a href="/user">Dashboard</a></li>
+            <li><a href="/customers">Customers</a></li>
             <li><a href="#">Stock</a></li>
             <li><a href="#">Invoices</a></li>
             <li><a href="#">Credit Notes</a></li>
@@ -14,16 +14,13 @@
             <li><a href="#">Reports</a></li>
         </ul>
     </nav>
+
     <div class="container">
         <header class="jumbotron">
             <div class="container">
-                <h1>Customer List</h1>
+                <h1>Welcome</h1>
             </div>
         </header>
-        <p>
-            <a class = "btn btn-primary btn-large" href ="/customers/new">Add New Customer</a>
-        </p>
-        <%= customers %>
     </div>
 </div>
 <% include ../partials/footer %>
