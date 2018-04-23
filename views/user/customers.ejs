@@ -24,18 +24,6 @@
         <p>
             <a class = "btn btn-primary btn-large" href ="/customers/new">Add New Customer</a>
         </p>
-
-        <div class="row">
-            <% customers.forEach(function(customers){ %>
-            <div class="col-md-3 col-sm-6">
-                <div class="thumbnail">
-                    <h4><%= customers.name %></h4>
-                    <p><%= customers.town %></p>
-                </div>
-            </div>
-            <% }); %>
-        </div>
-
     </div>
-
+</div>
 <% include ../partials/footer %>

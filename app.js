@@ -1,17 +1,27 @@
 //Frameworks and Libraries
 var express = require("express");
+var mysql = require("mysql");
 var app = express();
-var bodyParser = require("body-parser")
+var bodyParser = require("body-parser");
+
+var db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "root",
+    database: "stock-system"
+});
+
+db.connect(function(error){
+    if(error){
+        console.log("Error with Database Connection");
+    } else{
+        console.log("Database is Connected\n");
+    }
+});
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-
-var customers = [
-    {name: "Brad", town: "hitchin"},
-    {name: "Dan", town: "hitchin"},
-    {name: "John", town: "luton"}
-];
 
 //Homepage / Login
 app.get("/", function(req, res){
@@ -20,12 +30,19 @@ app.get("/", function(req, res){
 
 // User Homepage
 app.get("/user", function(req, res) {
-    res.render("user/index", {customers:customers});
+    res.render("user/index");
 });
 
 //Customer Page
 app.get("/customers", function(req, res) {
-    res.render("user/customers", {customers:customers});
+    res.render("user/customers");
+    db.query("SELECT * FROM customer", function(error, res) {
+        if (error) {
+            console.log("Error with showing SQL")
+        } else {
+            console.log(res, {customers:customers});
+        }
+    });
 });
 
 // New Customer Post Request
