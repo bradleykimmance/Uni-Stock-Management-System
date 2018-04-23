@@ -6,7 +6,7 @@
     min-width: 200px;
     max-width: 200px;
     height: 100vh;
-    background: #7386D5;
+    background: #02802f;
     color: #fff;
 }
 
@@ -28,17 +28,13 @@ a, a:hover, a:focus {
 }
 
 #sidebar ul li a:hover {
-    color: #7386D5;
+    color: #02802f;
     background: #fff;
 }
 
 #sidebar ul li.active > a {
     color: #fff;
-    background: #565eac;
-}
-
-.copyright{
-    text-align:center;
+    background: #025f27;
 }
 
 .logout{
@@ -50,4 +46,54 @@ a, a:hover, a:focus {
 .logout:hover{
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
     color: #d6d6d6;
+}
+
+#customerTable{
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#customerTable td, #customerTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#customerTable tr:nth-child(even){
+    background-color: #e5e5e5;
+}
+
+#customerTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #02802f;
+    color: white;
+}
+
+.button{
+    padding: 12px 22px;
+    border: 0 none;
+    font-weight: 700;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.button:focus, .button:active:focus, .button.active:focus {
+    outline: 0 none;
+}
+
+.button-primary {
+    background: #02802f;
+    color: #ffffff;
+}
+
+.button-primary:hover, .button-primary:focus, .buttonn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background: #029730;
+    color: #ffffff;
+}
+
+.button-primary:active, .button-primary.active {
+    background: #02a533;
+    box-shadow: none;
+    color: #ffffff;
 }

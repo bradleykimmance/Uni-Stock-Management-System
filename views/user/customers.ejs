@@ -21,9 +21,30 @@
             </div>
         </header>
         <p>
-            <a class = "btn btn-primary btn-large" href ="/customers/new">Add New Customer</a>
+            <a class = "button button-primary" href ="/customers/new">Add New Customer</a>
         </p>
-        <%= customers %>
+
+        <table id="customerTable">
+            <tr>
+                <th>Business Name</th>
+                <th>Address Line 1</th>
+                <th>Address Line 2</th>
+                <th>Country</th>
+                <th>VAT Number</th>
+                <th>Email</th>
+            </tr>
+            <% customers.forEach(function(customer){ %>
+                <tr>
+                    <td><%=customer.customerBusiness%></td>
+                    <td><%=customer.customerAddress1%></td>
+                    <td><%=customer.customerAddress2%></td>
+                    <td><%=customer.customerCountry%></td>
+                    <td><%=customer.customerVAT%></td>
+                    <td><%=customer.customerEmail%></td>
+                </tr>
+            <% }) %>
+        </table>
     </div>
 </div>
+
 <% include ../partials/footer %>

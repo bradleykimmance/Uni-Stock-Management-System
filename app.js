@@ -35,7 +35,7 @@ app.get("/user", function(req, res) {
 
 //Customer Page
 app.get("/customers", function(req, res) {
-    db.query("SELECT * FROM customer", function(err, customers, fields) {
+    db.query("SELECT * FROM customer", function(err, customers) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
