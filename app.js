@@ -106,6 +106,31 @@ app.get("/customers/new", function(req, res){
     res.render("user/newcustomer.ejs");
 });
 
+// Stock Page
+app.get("/stock", function(req, res) {
+    res.render("user/stock");
+});
+
+// Invoice Page
+app.get("/invoices", function(req, res) {
+    res.render("user/invoices");
+});
+
+// Credit Note Page
+app.get("/creditnotes", function(req, res) {
+    res.render("user/credit_notes");
+});
+
+// Offers Page
+app.get("/offers", function(req, res) {
+    res.render("user/offers");
+});
+
+// User Homepage
+app.get("/reports", function(req, res) {
+    res.render("user/reports");
+});
+
 //Start Server on Port 3000
 app.listen(3000, process.env.IP, function(){
     console.log("The Server Has Started.");
