@@ -126,7 +126,7 @@ app.get("/offers", function(req, res) {
     res.render("user/offers");
 });
 
-// User Homepage
+// Reports Page
 app.get("/reports", function(req, res) {
     res.render("user/reports");
 });
