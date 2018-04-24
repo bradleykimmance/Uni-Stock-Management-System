@@ -143,7 +143,7 @@ app.get("/reports", function(req, res) {
 });
 
 //================
-//Admin Pages
+//ADMIN PAGES
 //================
 
 // Get Admin Homepage
@@ -151,9 +151,67 @@ app.get("/admin", function(req, res) {
     res.render("admin/index");
 });
 
+// Get Customer Page
+app.get("/admin/customers", function(req, res) {
+    db.query("SELECT * FROM customer", function(err, customers) {
+        if (err) {
+            console.log("Error with showing SQL")
+        } else {
+            res.render("admin/customers", {customers:customers});
+        }
+    });
+});
+
+
+// Get New Customer Form Page
+app.get("/admin/customers/new", function(req, res){
+    res.render("admin/newcustomer.ejs");
+});
+
+// New Customer Post Request
+app.post("/admin/customers", function(req, res){
+    var name = req.body.name;
+    var town = req.body.town;
+    var newCustomer = {name: name, town: town};
+    customers.push(newCustomer);
+
+    //Redirect back to customers page
+    res.redirect("/admin/customers");
+});
+
+// Get Users Page
+app.get("/admin/users", function(req, res) {
+    res.render("admin/users");
+});
+
 // Create New User
 app.get("/admin/users/new", function(req, res) {
     res.render("admin/newuser");
+});
+
+// Get Stock Page
+app.get("/admin/stock", function(req, res) {
+    res.render("admin/stock");
+});
+
+// Get Invoice Page
+app.get("/admin/invoices", function(req, res) {
+    res.render("admin/invoices");
+});
+
+// Get Credit Note Page
+app.get("/admin/creditnotes", function(req, res) {
+    res.render("admin/credit_notes");
+});
+
+// Get Offers Page
+app.get("/admin/offers", function(req, res) {
+    res.render("admin/offers");
+});
+
+// Get Reports Page
+app.get("/admin/reports", function(req, res) {
+    res.render("admin/reports");
 });
 
 // Start Server on Port 3000
