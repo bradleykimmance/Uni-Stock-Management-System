@@ -95,6 +95,10 @@ app.get('/logout', function (req, res){
     });
 });
 
+//==================================================================================
+// FUNCTIONS FOR AUTHENTICATION AND AUTHORIZATION
+//==================================================================================
+
 // Check Authentication
 function isAuthenticated(req, res, next) {
 
@@ -134,7 +138,9 @@ app.get("/", function(req, res){
     res.render("login")
 });
 
-// AUTHENTICATION ROUTES
+//==================================================================================
+// AUTHENTICATED ROUTES
+//==================================================================================
 
 // Get User Homepage
 app.get("/user", isAuthenticated, function(req, res) {
