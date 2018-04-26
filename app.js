@@ -66,7 +66,7 @@ passport.use('local-login', new LocalStrategy({
             }
 
             // Password Correct
-            var user_id = rows[0].userID;
+            var user_id = [rows[0].userID, rows[0].fName, rows[0].adminID];
             return done(null, user_id);
             });
 }));
@@ -83,7 +83,6 @@ passport.deserializeUser(function(user_id, done) {
 
 //Check Login Details
 app.post("/", passport.authenticate('local-login', {
-
     successRedirect: '/admin/home',
     failureRedirect: '/'
 }));
@@ -109,24 +108,19 @@ function isAuthenticated(req, res, next) {
 
 }
 
-//Check Admin
+//Check if User is Admin
 function isAdmin(req, res, next){
-
-    db.query("SELECT adminID FROM account WHERE userID = '" + req.user + "'", function(err, rows) {
-        var adminID = rows[0].adminID;
-        if (err) {
-            console.log("Error with adminID")
-        }
-        if (adminID === 1){
-            console.log("You are an Admin User")
+    if (req.isAuthenticated()) {
+        var adminID = req.user[2];
+        if (adminID === 1) {
             return next();
         }
         else {
             console.log("You are a Standard User");
             res.redirect('/user');
+            }
         }
-    });
-
+    else{res.redirect('/');}
 }
 
 //==================================================================================
@@ -144,7 +138,7 @@ app.get("/", function(req, res){
 
 // Get User Homepage
 app.get("/user", isAuthenticated, function(req, res) {
-    res.render("user/index");
+    res.render("user/index", {userFName: req.user[1]});
 });
 
 // Get Customer Page
@@ -153,52 +147,34 @@ app.get("/customers", isAuthenticated, function(req, res, next) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
-            res.render("user/customers", {customers:customers});
+            res.render("user/customers", {customers:customers, userFName: req.user[1]});
         }
     });
 });
 
-
-// Get New Customer Form Page
-app.get("/customers/new", isAuthenticated, function(req, res){
-    res.render("user/newcustomer.ejs");
-});
-
-// New Customer Post Request
-app.post("/customers", function(req, res){
-    var name = req.body.name;
-    var town = req.body.town;
-    var newCustomer = {name: name, town: town};
-    customers.push(newCustomer);
-
-    //Redirect back to customers page
-    res.redirect("/customers");
-});
-
-
 // Get Stock Page
 app.get("/stock", isAuthenticated, function(req, res) {
-    res.render("user/stock");
+    res.render("user/stock", {userFName: req.user[1]});
 });
 
 // Get Invoice Page
 app.get("/invoices", isAuthenticated, function(req, res) {
-    res.render("user/invoices");
+    res.render("user/invoices", {userFName: req.user[1]});
 });
 
 // Get Credit Note Page
 app.get("/creditnotes", isAuthenticated, function(req, res) {
-    res.render("user/credit_notes");
+    res.render("user/credit_notes", {userFName: req.user[1]});
 });
 
 // Get Offers Page
 app.get("/offers", isAuthenticated, function(req, res) {
-    res.render("user/offers");
+    res.render("user/offers", {userFName: req.user[1]});
 });
 
 // Get Reports Page
 app.get("/reports", isAuthenticated, function(req, res) {
-    res.render("user/reports");
+    res.render("user/reports", {userFName: req.user[1]});
 });
 
 //==================================================================================
@@ -209,24 +185,24 @@ app.get("/reports", isAuthenticated, function(req, res) {
 app.all('/admin/*', isAdmin);
 
 // Get Admin Homepage
-app.get("/admin/home", isAuthenticated, isAdmin, function(req, res) {
-    res.render("admin/index");
+app.get("/admin/home", function(req, res) {
+    res.render("admin/index", {userFName: req.user[1]});
 });
 
 // Get Customer Page
-app.get("/admin/customers", isAuthenticated, function(req, res) {
+app.get("/admin/customers", function(req, res) {
     db.query("SELECT * FROM customer", function(err, customers) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
-            res.render("admin/customers", {customers:customers});
+            res.render("admin/customers", {customers:customers, userFName: req.user[1]});
         }
     });
 });
 
 // Get New Customer Form Page
-app.get("/admin/customers/new", isAuthenticated, function(req, res){
-    res.render("admin/newcustomer.ejs");
+app.get("/admin/customers/new", function(req, res){
+    res.render("admin/newcustomer.ejs", {userFName: req.user[1]});
 });
 
 // New Customer Post Request
@@ -240,14 +216,39 @@ app.post("/admin/customers", function(req, res){
     res.redirect("/admin/customers");
 });
 
+// Get Stock Page
+app.get("/admin/stock", function(req, res) {
+    res.render("admin/stock", {userFName: req.user[1]});
+});
+
+// Get Invoice Page
+app.get("/admin/invoices", function(req, res) {
+    res.render("admin/invoices", {userFName: req.user[1]});
+});
+
+// Get Credit Note Page
+app.get("/admin/creditnotes", function(req, res) {
+    res.render("admin/credit_notes", {userFName: req.user[1]});
+});
+
+// Get Offers Page
+app.get("/admin/offers", function(req, res) {
+    res.render("admin/offers", {userFName: req.user[1]});
+});
+
+// Get Reports Page
+app.get("/admin/reports", function(req, res) {
+    res.render("admin/reports", {userFName: req.user[1]});
+});
+
 // Get Users Page
-app.get("/admin/users", isAuthenticated, function(req, res) {
-    res.render("admin/users");
+app.get("/admin/users", function(req, res) {
+    res.render("admin/users", {userFName: req.user[1]});
 });
 
 // Create New User
-app.get("/admin/users/new", isAuthenticated, function(req, res) {
-    res.render("admin/newuser");
+app.get("/admin/users/new", function(req, res) {
+    res.render("admin/newuser", {userFName: req.user[1]});
 });
 
 // Handle New User
@@ -255,29 +256,19 @@ app.post("/admin/users", function(req,res){
     res.send()
 });
 
-// Get Stock Page
-app.get("/admin/stock", isAuthenticated, function(req, res) {
-    res.render("admin/stock");
+// Get Currencies Page
+app.get("/admin/currencies", function(req, res) {
+    res.render("admin/currencies", {userFName: req.user[1]});
 });
 
-// Get Invoice Page
-app.get("/admin/invoices", isAuthenticated, function(req, res) {
-    res.render("admin/invoices");
+// Get Products Page
+app.get("/admin/products", function(req, res) {
+    res.render("admin/products", {userFName: req.user[1]});
 });
 
-// Get Credit Note Page
-app.get("/admin/creditnotes", isAuthenticated, function(req, res) {
-    res.render("admin/credit_notes");
-});
-
-// Get Offers Page
-app.get("/admin/offers", isAuthenticated, function(req, res) {
-    res.render("admin/offers");
-});
-
-// Get Reports Page
-app.get("/admin/reports", isAuthenticated, function(req, res) {
-    res.render("admin/reports");
+// Get Positions Page
+app.get("/admin/positions", function(req, res) {
+    res.render("admin/positions", {userFName: req.user[1]});
 });
 
 //==================================================================================

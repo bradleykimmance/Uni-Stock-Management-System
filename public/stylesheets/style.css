@@ -40,12 +40,17 @@ a, a:hover, a:focus {
 .logout{
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
     color: #ffffff;
-    font-size: 1.5em;
+    font-size: 1.3em;
 }
 
 .logout:hover{
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
     color: #d6d6d6;
+}
+
+.navbarName{
+    color: #ffffff;
+    font-size: 1.3em;
 }
 
 #customerTable{
