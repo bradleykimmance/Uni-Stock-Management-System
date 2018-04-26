@@ -21,70 +21,71 @@
     <div class="container">
         <header class="jumbotron">
             <div class="container">
-                <h1>Create a new Customer</h1>
+                <h1>Edit Customer</h1>
             </div>
         </header>
 
 
-    <form class = "form-center" action="/admin/customers" method="POST">
+    <form class = "form-center" action="/admin/customers/edit" method="POST">
         <div class="form-group row">
+            <input type="hidden" name="customerID" value="<%=customerID%>">
             <label for="customerBusiness" class="col-2 col-form-label">Business Name:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerBusiness" required autofocus>
+                <input type="text" class="form-control" name = "customerBusiness" value="<%=customerBusiness%>" required>
             </div>
         </div>
         <div class="form-group row">
             <label for="customerAddress1" class="col-2 col-form-label">Address Line 1:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerAddress1" required>
+                <input type="text" class="form-control" name = "customerAddress1" value="<%= customerAddress1 %>" required>
             </div>
         </div>
         <div class="form-group row">
             <label for="customerAddress2" class="col-2 col-form-label">Address Line 2:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerAddress2" required>
+                <input type="text" class="form-control" name = "customerAddress2" value="<%= customerAddress2 %>" required>
             </div>
         </div>
         <div class="form-group row">
             <label for="customerAddress3" class="col-2 col-form-label">Address Line 3:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerAddress3">
+                <input type="text" class="form-control" name = "customerAddress3" value="<%= customerAddress3 %>">
             </div>
         </div>
         <div class="form-group row">
             <label for="customerCountry" class="col-2 col-form-label">Country:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerCountry" required>
+                <input type="text" class="form-control" name = "customerCountry" value="<%= customerCountry %>" required>
             </div>
         </div>
         <div class="form-group row">
             <label for="customerNumber" class="col-2 col-form-label">Business Number:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerNumber">
+                <input type="text" class="form-control" name = "customerNumber" value="<%= customerNumber %>">
             </div>
         </div>
         <div class="form-group row">
             <label for="customerVAT" class="col-2 col-form-label">VAT Number:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerVAT" >
+                <input type="text" class="form-control" name = "customerVAT" value="<%= customerVAT %>">
             </div>
         </div>
         <div class="form-group row">
             <label for="customerEmail" class="col-2 col-form-label">Email:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerEmail" required>
+                <input type="text" class="form-control" name = "customerEmail" value="<%= customerEmail %>" required>
             </div>
         </div>
         <div class="form-group row">
             <label for="customerEmailCC" class="col-2 col-form-label">Secondary Email:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerEmailCC">
+                <input type="text" class="form-control" name = "customerEmailCC" value="<%= customerEmailCC %>">
             </div>
         </div>
         <div class="form-group row">
             <label for="customerPhone" class="col-2 col-form-label">Phone Number:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "customerPhone">
+                <input type="text" class="form-control" name = "customerPhone" value="<%= customerPhone %>">
             </div>
         </div>
         <button class = "button button-primary button-form">Submit!</button>

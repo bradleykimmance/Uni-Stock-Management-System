@@ -5,7 +5,7 @@
 #sidebar {
     min-width: 200px;
     max-width: 200px;
-    height: 100vh;
+    height: 145vh;
     background: #02802f;
     color: #fff;
 }
@@ -101,4 +101,17 @@ a, a:hover, a:focus {
     background: #02a533;
     box-shadow: none;
     color: #ffffff;
+}
+
+.button-form {
+    margin-left: 25%;
+}
+
+.editButton{
+    font-weight: bold;
+}
+
+.form-center{
+    width: 90%;
+    margin: 0 auto;
 }

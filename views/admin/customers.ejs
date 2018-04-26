@@ -45,10 +45,15 @@
                     <td><%=customer.customerCountry%></td>
                     <td><%=customer.customerVAT%></td>
                     <td><%=customer.customerEmail%></td>
+                    <td>
+                        <div>
+                            <a class="editButton" href='/admin/customers/edit/<%= customer.customerID %>'>Edit</a>
+                        </div>
+                    </td>
                 </tr>
             <% }) %>
         </table>
-    </div>
-</div>
+
+
 
 <% include ../partials/footer %>

@@ -2,10 +2,11 @@
 var express         = require("express");
 var mysql           = require("mysql");
 var passport        = require("passport");
-var LocalStrategy   = require('passport-local').Strategy;
+var LocalStrategy   = require("passport-local").Strategy;
+var methodOverride  = require("method-override");
 var bodyParser      = require("body-parser");
-var crypto          = require('crypto');
-var session         = require('express-session');
+var crypto          = require("crypto");
+var session         = require("express-session");
 
 var db = mysql.createConnection({
     host: "localhost",
@@ -26,6 +27,7 @@ var app = express();
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+app.use(methodOverride("_method"));
 
 //==================================================================================
 //LOGIN AUTHENTICATION
@@ -207,13 +209,72 @@ app.get("/admin/customers/new", function(req, res){
 
 // New Customer Post Request
 app.post("/admin/customers", function(req, res){
-    var name = req.body.name;
-    var town = req.body.town;
-    var newCustomer = {name: name, town: town};
-    customers.push(newCustomer);
+    var query =     "INSERT INTO customer (";
+    query +=        "customerBusiness, customerAddress1, customerAddress2,";
+    query +=        " customerAddress3, customerCountry, customerNumber,";
+    query +=        " customerVAT, customerEmail, customerEmailCC, customerPhone)";
+    query +=        " VALUES ('"+req.body.customerBusiness+"', '"+req.body.customerAddress1+"'";
+    query +=        ", '"+req.body.customerAddress2+"', '"+req.body.customerAddress3+"'";
+    query +=        ", '"+req.body.customerCountry+"', '"+req.body.customerNumber+"'";
+    query +=        ", '"+req.body.customerVAT+"', '"+req.body.customerEmail+"'";
+    query +=        ", '"+req.body.customerEmailCC+"', '"+req.body.customerPhone+"')"
 
-    //Redirect back to customers page
-    res.redirect("/admin/customers");
+    console.log(query);
+    db.query(query, function(err,result){
+        console.log("Customer Added");
+        res.redirect("/admin/customers");
+    })
+});
+
+// Edit Customer Page
+app.get("/admin/customers/edit/:id", function(req,res){
+    db.query("SELECT * FROM customer WHERE customerID = "+ req.params.id, function(err, rows, fields){
+        if(err){
+            console.log("Failed to Update Customer");
+            res.redirect("/admin/customers")
+    }
+        if(rows.length <= 0){
+            console.log("Failed to Find Customer");
+            res.redirect("/admin/customers")
+        }
+        else{
+            res.render("admin/editcustomer", {
+                customerID:rows[0].customerID,
+                customerBusiness:rows[0].customerBusiness,
+                customerAddress1:rows[0].customerAddress1,
+                customerAddress2:rows[0].customerAddress2,
+                customerAddress3:rows[0].customerAddress3,
+                customerCountry:rows[0].customerCountry,
+                customerNumber:rows[0].customerNumber,
+                customerVAT:rows[0].customerVAT,
+                customerEmail:rows[0].customerEmail,
+                customerEmailCC:rows[0].customerEmailCC,
+                customerPhone:rows[0].customerPhone,
+                userFName: req.user[1]
+            })
+        }
+    })
+});
+
+// Update Customer
+app.post("/admin/customers/edit", function(req, res){
+        var query =         "UPDATE customer SET";
+            query +=        " customerBusiness = '"+req.body.customerBusiness+"',";
+            query +=        " customerAddress1 = '"+req.body.customerAddress1+"',";
+            query +=        " customerAddress2 = '"+req.body.customerAddress2+"',";
+            query +=        " customerAddress3 = '"+req.body.customerAddress3+"',";
+            query +=        " customerCountry = '"+req.body.customerCountry+"',";
+            query +=        " customerNumber = '"+req.body.customerNumber+"',";
+            query +=        " customerVAT = '"+req.body.customerVAT+"',";
+            query +=        " customerEmail = '"+req.body.customerEmail+"',";
+            query +=        " customerEmailCC = '"+req.body.customerEmailCC+"',";
+            query +=        " customerPhone = '"+req.body.customerPhone+"'";
+            query +=        " WHERE customerID = "+req.body.customerID+"";
+
+        db.query(query, function(err,result){
+            console.log("Customer Updated");
+            res.redirect("/admin/customers");
+        })
 });
 
 // Get Stock Page
