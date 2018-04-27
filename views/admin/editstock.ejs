@@ -29,21 +29,29 @@
     <form class = "form-center" action="/admin/stock/edit" method="POST">
         <input type="hidden" name="stockID" value="<%=stockID%>">
         <div class="form-group row">
-            <label for="stock_productID" class="col-2 col-form-label">Product:</label>
+            <label for="stock_productID" class="col-2 col-form-label">Select Product:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "stock_productID" value="<%=stock_productID%>" required autofocus>
+                <select class="form-control" name="stock_productID" required>
+                    <% product.forEach(function(product){ %>
+                    <option <%if(stock_productID === product.productID){%>selected<%}else{}%> value ="<%= product.productID%>" > <%= product.productName%> </option>
+                    <%})%>
+                </select>
             </div>
         </div>
         <div class="form-group row">
-            <label for="quantityStockBought" class="col-2 col-form-label">Quantity:</label>
+            <label for="quantityStockCurrent" class="col-2 col-form-label">Quantity:</label>
             <div class="col-4">
-                <input type="number" class="form-control" name = "quantityStockBought" value="<%=stock.quantityStockCurrent%>" required>
+                <input type="number" class="form-control" name = "quantityStockCurrent" value="<%=quantityStockCurrent%>" required>
             </div>
         </div>
         <div class="form-group row">
-            <label for="stock_currencyID" class="col-2 col-form-label">Currency:</label>
+            <label for="stock_currencyID" class="col-2 col-form-label">Select Currency:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "stock_currencyID" value="<%=stock_currencyID%>" required>
+                <select class="form-control" name="stock_currencyID" required>
+                    <% currency.forEach(function(currency){ %>
+                    <option <%if(stock_currencyID === currency.currencyID){%>selected<%}else{}%> value ="<%= currency.currencyID%>" > <%= currency.currencyName%> </option>
+                    <%})%>
+                </select>
             </div>
         </div>
         <div class="form-group row">
@@ -53,15 +61,19 @@
             </div>
         </div>
         <div class="form-group row">
-            <label for="stock_customerID" class="col-2 col-form-label">Customer:</label>
+            <label for="stock_customerID" class="col-2 col-form-label">Bought From:</label>
             <div class="col-4">
-                <input type="text" class="form-control" name = "stock_customerID" value="<%=stock_customerID%>" required>
+                <select class="form-control" name="stock_customerID" required>
+                    <% customer.forEach(function(customer){ %>
+                    <option <%if(stock_customerID === customer.customerID){%>selected<%}else{}%> value ="<%= customer.customerID%>" > <%= customer.customerBusiness%> </option>
+                    <%})%>
+                </select>
             </div>
         </div>
         <div class="form-group row">
-            <label for="boughtDate" class="col-2 col-form-label">Date of Purchase</label>
+            <label for="boughtDate" class="col-2 col-form-label">Date of Purchase:</label>
             <div class="col-4">
-                <input type="date" class="form-control" name = "boughtDate" value="<%=boughtDate%>" required>
+                <input type="date" class="form-control" name = "boughtDate" value="<%= boughtDate.getFullYear()+'-'+ ('0' +(boughtDate.getMonth()+1)).slice(-2)+'-'+('0' +boughtDate.getDate()).slice(-2)%>" required>
             </div>
         </div>
         <button class = "button button-primary button-form">Submit!</button>

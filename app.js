@@ -277,44 +277,12 @@ app.post("/admin/customers/edit", function(req, res){
 
 // Get Stock Page
 app.get("/admin/stock", function(req, res) {
-    db.query("SELECT * FROM stock", function (err, stock) {
+    db.query("SELECT * FROM stock JOIN product ON stock.stock_productID = productID JOIN currency ON stock.stock_currencyID = currencyID JOIN customer ON stock.stock_customerID = customerID", function (err, stock) {
         if (err) {
             console.log("Error with showing SQL")
-        } else {
-            console.log(stock);
-            console.log(stock.length);
-            for (var i = 0; i < stock.length; i++) {
-                db.query("SELECT * FROM product WHERE productID = " + stock[i].stock_productID, function (err, product) {
-                    if (err) {
-                        console.log("Error");
-                    }
-                    else {
-                        stock[i].stock_productID = product[0].productName
-                    }
-
-                });
-                db.query("SELECT * FROM currency WHERE currencyID = " + stock[i].stock_currencyID, function (err, currency) {
-                    if (err) {
-                        console.log("Error");
-                    }
-                    else {
-                        stock[i].stock_currencyID = currency[0].currencyName
-                    }
-
-                });
-                db.query("SELECT * FROM customer WHERE customerID = " + stock[i].stock_customerID, function (err, customer) {
-                    if (err) {
-                        console.log("Error");
-                    }
-                    else {
-                        stock[i].stock_customerID = customer[0].customerBusiness;
-                    }
-                })
-            }
-            if (i === stock.length - 1) {
-                console.log(stock[1].stock_productID);
-                res.render("admin/stock", {stock: stock, userFName: req.user[1]})
-            }
+        }
+        else {
+            res.render("admin/stock.ejs", {stock:stock, userFName: req.user[1]});
         }
     })
 });
@@ -322,7 +290,13 @@ app.get("/admin/stock", function(req, res) {
 
 // Get New Stock Page
 app.get("/admin/stock/new", function(req, res){
-    res.render("admin/newstock.ejs", {userFName: req.user[1]});
+    db.query("SELECT * FROM product", function(err, product){
+        db.query("SELECT * FROM customer", function(err, customer){
+            db.query("SELECT * FROM currency", function(err, currency){
+                res.render("admin/newstock.ejs", {product:product, customer:customer, currency:currency, userFName: req.user[1]});
+            })
+        })
+    });
 });
 
 // New Stock Post Request
@@ -354,15 +328,24 @@ app.get("/admin/stock/edit/:id", function(req,res){
             res.redirect("/admin/stock")
         }
         else{
-            res.render("admin/editstock", {
-                stockID:rows[0].stockID,
-                stock_productID:rows[0].stock_productID,
-                quantityStockCurrent:rows[0].stock.quantityStockCurrent,
-                stock_currencyID:rows[0].stock_currencyID,
-                priceBought:rows[0].priceBought,
-                stock_customerID:rows[0].stock_customerID,
-                boughtDate:rows[0].boughtDate,
-                userFName:req.user[1]
+            db.query("SELECT * FROM product", function(err, product) {
+                db.query("SELECT * FROM customer", function (err, customer) {
+                    db.query("SELECT * FROM currency", function (err, currency) {
+                        res.render("admin/editstock", {
+                            product: product,
+                            customer: customer,
+                            currency: currency,
+                            stockID: rows[0].stockID,
+                            stock_productID: rows[0].stock_productID,
+                            quantityStockCurrent: rows[0].quantityStockCurrent,
+                            stock_currencyID: rows[0].stock_currencyID,
+                            priceBought: rows[0].priceBought,
+                            stock_customerID: rows[0].stock_customerID,
+                            boughtDate: rows[0].boughtDate,
+                            userFName: req.user[1]
+                        })
+                    })
+                })
             })
         }
     })
@@ -371,17 +354,16 @@ app.get("/admin/stock/edit/:id", function(req,res){
 // Update Stock
 app.post("/admin/stock/edit", function(req, res){
     var query =         "UPDATE stock SET";
-    query +=        " stockID = '"+req.body.stockID+"',";
     query +=        " stock_productID = '"+req.body.stock_productID+"',";
     query +=        " quantityStockCurrent = '"+req.body.quantityStockCurrent+"',";
     query +=        " stock_currencyID = '"+req.body.stock_currencyID+"',";
     query +=        " priceBought = '"+req.body.priceBought+"',";
     query +=        " stock_customerID = '"+req.body.stock_customerID+"',";
-    query +=        " boughtDate = '"+req.body.boughtDate+"',";
+    query +=        " boughtDate = '"+req.body.boughtDate+"'";
     query +=        " WHERE stockID = "+req.body.stockID+"";
 
     db.query(query, function(err,result){
-        console.log("Stock Updated");
+        console.log(query);
         res.redirect("/admin/stock");
     })
 });

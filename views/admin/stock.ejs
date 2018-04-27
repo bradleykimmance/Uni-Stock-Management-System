@@ -40,12 +40,12 @@
                 </tr>
                 <% stock.forEach(function(stock){ %>
                 <tr>
-                    <td><%=stock.stock_productID%></td>
+                    <td><%=stock.productName%></td>
                     <td><%=stock.quantityStockCurrent%></td>
-                    <td><%=stock.stock_currencyID%></td>
+                    <td><%=stock.currencyName%></td>
                     <td><%=stock.priceBought%></td>
-                    <td><%=stock.boughtDate%></td>
-                    <td><%=stock.stock_customerID%></td>
+                    <td><%=('0' + stock.boughtDate.getDate()).slice(-2) +'/'+ ('0' + (stock.boughtDate.getMonth()+1)).slice(-2) +'/'+ stock.boughtDate.getFullYear()%></td>
+                    <td><%=stock.customerBusiness%></td>
                     <td>
                         <div>
                             <a class="editButton" href='/admin/stock/edit/<%= stock.stockID %>'>Edit</a>
