@@ -21,28 +21,29 @@
     <div class="container">
         <header class="jumbotron">
             <div class="container">
-                <h1>Create a new User</h1>
+                <h1>Edit User</h1>
             </div>
         </header>
 
 
-        <form action="/admin/users" method="POST">
+        <form action="/admin/users/edit" method="POST">
             <div class="form-group row">
+                <input type="hidden" name="userID" value="<%=userID%>">
                 <label for="fName" class="col-2 col-form-label">First Name:</label>
                 <div class="col-4">
-                    <input type="text" class="form-control" name = "fName" required>
+                    <input type="text" class="form-control" name = "fName" value="<%=fName%>" required>
                 </div>
             </div>
             <div class="form-group row">
                 <label for="lName" class="col-2 col-form-label">Last Name:</label>
                 <div class="col-4">
-                    <input type="text" class="form-control" name = "lName" required>
+                    <input type="text" class="form-control" name = "lName" value="<%=lName%>" required>
                 </div>
             </div>
             <div class="form-group row">
                 <label for="email" class="col-2 col-form-label">Email:</label>
                 <div class="col-4">
-                    <input type="email" class="form-control" name = "email" required>
+                    <input type="email" class="form-control" name = "email" value="<%=email%>" required>
                 </div>
             </div>
             <div class="form-group row">
@@ -54,7 +55,7 @@
             <div class="form-group row">
                 <label for="registerDate" class="col-2 col-form-label">Register Date:</label>
                 <div class="col-4">
-                    <input type="date" class="form-control" name = "registerDate" required>
+                    <input type="date" class="form-control" name = "registerDate" value="<%=registerDate.getFullYear()+'-'+ ('0' +(registerDate.getMonth()+1)).slice(-2)+'-'+('0' +registerDate.getDate()).slice(-2)%>" required>
                 </div>
             </div>
             <div class="form-group row">
@@ -63,7 +64,7 @@
                     <select class="form-control" name="user_positionID" required>
                         <option disabled selected value></option>
                         <% position.forEach(function(position){ %>
-                        <option value ="<%= position.positionID%>"> <%= position.positionName%> </option>
+                        <option <%if(user_positionID === position.positionID){%>selected<%}else{}%> value ="<%= position.positionID%>"> <%= position.positionName%> </option>
                         <%})%>
                     </select>
                 </div>

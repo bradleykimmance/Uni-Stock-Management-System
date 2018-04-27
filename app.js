@@ -389,17 +389,92 @@ app.get("/admin/reports", function(req, res) {
 
 // Get Users Page
 app.get("/admin/users", function(req, res) {
-    res.render("admin/users", {userFName: req.user[1]});
+    db.query("SELECT * FROM account JOIN position ON account.user_positionID = positionID", function(err, users) {
+        if (err) {
+            console.log("Error with showing SQL")
+        } else {
+            res.render("admin/users", {users:users, userFName: req.user[1]});
+        }
+    });
 });
 
 // Create New User
 app.get("/admin/users/new", function(req, res) {
-    res.render("admin/newuser", {userFName: req.user[1]});
+    db.query("SELECT * FROM position", function(err, position) {
+        res.render("admin/newuser", {position:position, userFName: req.user[1]});
+    })
 });
 
 // Handle New User
 app.post("/admin/users", function(req,res){
-    res.send()
+
+    var salt = 'b5y7s9j83yf537gkb8tu2ic6b5vk4ue8au8cysy4';
+    salt = salt + '' + req.body.password;
+    var encPassword = crypto.createHash('sha1').update(salt).digest('hex');
+
+    var query =     "INSERT INTO account (";
+    query +=        "fName, lName, email, password, registerDate, user_positionID, adminID)";
+    query +=        " VALUES ('"+req.body.fName+"', '"+req.body.lName+"'";
+    query +=        ", '"+req.body.email+"', '"+encPassword+"'";
+    query +=        ", '"+req.body.registerDate+"', '"+req.body.user_positionID+"', '"+req.body.adminID+"')";
+
+    console.log(query);
+    db.query(query, function(err,result){
+        console.log("User Added");
+        res.redirect("/admin/users");
+    })
+});
+
+// Edit User Page
+app.get("/admin/users/edit/:id", function(req,res){
+    db.query("SELECT * FROM account WHERE userID = "+ req.params.id, function(err, rows){
+        if(err){
+            console.log("Failed to Update User");
+            res.redirect("/admin/customers")
+        }
+        if(rows.length <= 0){
+            console.log("Failed to Find User");
+            res.redirect("/admin/customers")
+        }
+        else{
+            db.query("SELECT * FROM position", function (err, position) {
+                res.render("admin/edituser", {
+                    position:position,
+                    userID: rows[0].userID,
+                    fName: rows[0].fName,
+                    lName: rows[0].lName,
+                    email: rows[0].email,
+                    registerDate: rows[0].registerDate,
+                    adminID: rows[0].adminID,
+                    user_positionID: rows[0].user_positionID,
+                    userFName: req.user[1]
+                })
+            })
+        }
+    })
+});
+
+// Update User
+app.post("/admin/users/edit", function(req, res){
+    var salt = 'b5y7s9j83yf537gkb8tu2ic6b5vk4ue8au8cysy4';
+    salt = salt + '' + req.body.password;
+    var encPassword = crypto.createHash('sha1').update(salt).digest('hex');
+
+    var query =         "UPDATE account SET";
+    query +=        " fName = '"+req.body.fName+"',";
+    query +=        " lName = '"+req.body.lName+"',";
+    query +=        " email = '"+req.body.email+"',";
+    query +=        " password = '"+encPassword+"',";
+    query +=        " registerDate = '"+req.body.registerDate+"',";
+    query +=        " adminID = '"+req.body.adminID+"',";
+    query +=        " user_positionID = '"+req.body.user_positionID+"'";
+    query +=        " WHERE userID = "+req.body.userID+"";
+
+    db.query(query, function(err,result){
+        console.log(query);
+        console.log("User Updated");
+        res.redirect("/admin/users");
+    })
 });
 
 // Get Currencies Page

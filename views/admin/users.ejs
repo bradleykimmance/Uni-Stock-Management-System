@@ -30,6 +30,32 @@
             <a class = "button button-primary" href ="/admin/users/new">Add New User</a>
         </p>
 
+        <table class="generalTable">
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Register Date</th>
+                <th>Position</th>
+                <th>Admin</th>
+            </tr>
+            <% users.forEach(function(users){ %>
+            <tr>
+                <td><%=users.fName%></td>
+                <td><%=users.lName%></td>
+                <td><%=users.email%></td>
+                <td><%=('0' + users.registerDate.getDate()).slice(-2) +'/'+ ('0' + (users.registerDate.getMonth()+1)).slice(-2) +'/'+ users.registerDate.getFullYear()%></td>
+                <td><%=users.positionName%></td>
+                <td><%=users.adminID%></td>
+                <td>
+                    <div>
+                        <a class="editButton" href='/admin/users/edit/<%= users.userID %>'>Edit</a>
+                    </div>
+                </td>
+            </tr>
+            <% }) %>
+        </table>
+
 
 
 <% include ../partials/footer %>
