@@ -66,7 +66,7 @@ passport.use('local-login', new LocalStrategy({
             }
 
             // Password Correct
-            var user_id = [rows[0].userID, rows[0].fName, rows[0].adminID];
+            var user_id = [rows[0].userID, rows[0].fName, rows[0].lName, rows[0].adminID];
             return done(null, user_id);
             });
 }));
@@ -111,7 +111,7 @@ function isAuthenticated(req, res, next) {
 //Check if User is Admin
 function isAdmin(req, res, next){
     if (req.isAuthenticated()) {
-        var adminID = req.user[2];
+        var adminID = req.user[3];
         if (adminID === 1) {
             return next();
         }
@@ -138,7 +138,7 @@ app.get("/", function(req, res){
 
 // Get User Homepage
 app.get("/user", isAuthenticated, function(req, res) {
-    res.render("user/index", {userFName: req.user[1]});
+    res.render("user/index", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Customer Page
@@ -147,34 +147,34 @@ app.get("/customers", isAuthenticated, function(req, res, next) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
-            res.render("user/customers", {customers:customers, userFName: req.user[1]});
+            res.render("user/customers", {customers:customers, userFName: req.user[1],userLName: req.user[2]});
         }
     });
 });
 
 // Get Stock Page
 app.get("/stock", isAuthenticated, function(req, res) {
-    res.render("user/stock", {userFName: req.user[1]});
+    res.render("user/stock", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Invoice Page
 app.get("/invoices", isAuthenticated, function(req, res) {
-    res.render("user/invoices", {userFName: req.user[1]});
+    res.render("user/invoices", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Credit Note Page
 app.get("/creditnotes", isAuthenticated, function(req, res) {
-    res.render("user/credit_notes", {userFName: req.user[1]});
+    res.render("user/credit_notes", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Offers Page
 app.get("/offers", isAuthenticated, function(req, res) {
-    res.render("user/offers", {userFName: req.user[1]});
+    res.render("user/offers", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Reports Page
 app.get("/reports", isAuthenticated, function(req, res) {
-    res.render("user/reports", {userFName: req.user[1]});
+    res.render("user/reports", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 //==================================================================================
@@ -186,7 +186,7 @@ app.all('/admin/*', isAdmin);
 
 // Get Admin Homepage
 app.get("/admin/home", function(req, res) {
-    res.render("admin/index", {userFName: req.user[1]});
+    res.render("admin/index", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Customer Page
@@ -195,14 +195,14 @@ app.get("/admin/customers", function(req, res) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
-            res.render("admin/customers", {customers:customers, userFName: req.user[1]});
+            res.render("admin/customers", {customers:customers, userFName: req.user[1],userLName: req.user[2]});
         }
     });
 });
 
 // Get New Customer Form Page
 app.get("/admin/customers/new", function(req, res){
-    res.render("admin/newcustomer.ejs", {userFName: req.user[1]});
+    res.render("admin/newcustomer.ejs", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // New Customer Post Request
@@ -248,7 +248,8 @@ app.get("/admin/customers/edit/:id", function(req,res){
                 customerEmail:rows[0].customerEmail,
                 customerEmailCC:rows[0].customerEmailCC,
                 customerPhone:rows[0].customerPhone,
-                userFName: req.user[1]
+                userFName: req.user[1],
+                userLName: req.user[2]
             })
         }
     })
@@ -282,7 +283,7 @@ app.get("/admin/stock", function(req, res) {
             console.log("Error with showing SQL")
         }
         else {
-            res.render("admin/stock.ejs", {stock:stock, userFName: req.user[1]});
+            res.render("admin/stock.ejs", {stock:stock, userFName: req.user[1],userLName: req.user[2]});
         }
     })
 });
@@ -293,7 +294,7 @@ app.get("/admin/stock/new", function(req, res){
     db.query("SELECT * FROM product", function(err, product){
         db.query("SELECT * FROM customer", function(err, customer){
             db.query("SELECT * FROM currency", function(err, currency){
-                res.render("admin/newstock.ejs", {product:product, customer:customer, currency:currency, userFName: req.user[1]});
+                res.render("admin/newstock.ejs", {product:product, customer:customer, currency:currency, userFName: req.user[1],userLName: req.user[2]});
             })
         })
     });
@@ -342,7 +343,8 @@ app.get("/admin/stock/edit/:id", function(req,res){
                             priceBought: rows[0].priceBought,
                             stock_customerID: rows[0].stock_customerID,
                             boughtDate: rows[0].boughtDate,
-                            userFName: req.user[1]
+                            userFName: req.user[1],
+                            userLName: req.user[2]
                         })
                     })
                 })
@@ -369,22 +371,22 @@ app.post("/admin/stock/edit", function(req, res){
 
 // Get Invoice Page
 app.get("/admin/invoices", function(req, res) {
-    res.render("admin/invoices", {userFName: req.user[1]});
+    res.render("admin/invoices", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Credit Note Page
 app.get("/admin/creditnotes", function(req, res) {
-    res.render("admin/credit_notes", {userFName: req.user[1]});
+    res.render("admin/credit_notes", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Offers Page
 app.get("/admin/offers", function(req, res) {
-    res.render("admin/offers", {userFName: req.user[1]});
+    res.render("admin/offers", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Reports Page
 app.get("/admin/reports", function(req, res) {
-    res.render("admin/reports", {userFName: req.user[1]});
+    res.render("admin/reports", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // Get Users Page
@@ -393,7 +395,7 @@ app.get("/admin/users", function(req, res) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
-            res.render("admin/users", {users:users, userFName: req.user[1]});
+            res.render("admin/users", {users:users, userFName: req.user[1],userLName: req.user[2]});
         }
     });
 });
@@ -401,7 +403,7 @@ app.get("/admin/users", function(req, res) {
 // Create New User
 app.get("/admin/users/new", function(req, res) {
     db.query("SELECT * FROM position", function(err, position) {
-        res.render("admin/newuser", {position:position, userFName: req.user[1]});
+        res.render("admin/newuser", {position:position, userFName: req.user[1],userLName: req.user[2]});
     })
 });
 
@@ -447,7 +449,8 @@ app.get("/admin/users/edit/:id", function(req,res){
                     registerDate: rows[0].registerDate,
                     adminID: rows[0].adminID,
                     user_positionID: rows[0].user_positionID,
-                    userFName: req.user[1]
+                    userFName: req.user[1],
+                    userLName: req.user[2]
                 })
             })
         }
@@ -483,14 +486,14 @@ app.get("/admin/currencies", function(req, res) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
-            res.render("admin/currencies", {currency:currency, userFName: req.user[1]});
+            res.render("admin/currencies", {currency:currency, userFName: req.user[1],userLName: req.user[2]});
         }
     });
 });
 
 // Get New Currency Form Page
 app.get("/admin/currencies/new", function(req, res){
-    res.render("admin/newcurrency.ejs", {userFName: req.user[1]});
+    res.render("admin/newcurrency.ejs", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // New Currency Post Request
@@ -524,7 +527,8 @@ app.get("/admin/currencies/edit/:id", function(req,res){
                 currencyConvert:rows[0].currencyConvert,
                 validFrom:rows[0].validFrom,
                 validUntil:rows[0].validUntil,
-                userFName: req.user[1]
+                userFName: req.user[1],
+                userLName: req.user[2]
             })
         }
     })
@@ -549,14 +553,14 @@ app.get("/admin/products", function(req, res) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
-            res.render("admin/products", {product:product, userFName: req.user[1]});
+            res.render("admin/products", {product:product, userFName: req.user[1],userLName: req.user[2]});
         }
     });
 });
 
 // Get New Product Form Page
 app.get("/admin/products/new", function(req, res){
-    res.render("admin/newproduct.ejs", {userFName: req.user[1]});
+    res.render("admin/newproduct.ejs", {userFName: req.user[1],userLName: req.user[2]});
 });
 
 // New Product Post Request
@@ -589,7 +593,8 @@ app.get("/admin/products/edit/:id", function(req,res){
                 productState:rows[0].productState,
                 productPlatform:rows[0].productPlatform,
                 productCategory:rows[0].productCategory,
-                userFName: req.user[1]
+                userFName: req.user[1],
+                userLName: req.user[2]
             })
         }
     })
@@ -614,21 +619,19 @@ app.get("/admin/positions", function(req, res) {
         if (err) {
             console.log("Error with showing SQL")
         } else {
-            res.render("admin/positions", {position:position, userFName: req.user[1]});
+            res.render("admin/positions", {position:position, userFName: req.user[1],userLName: req.user[2]});
         }
     });
 });
 
 // Get New Position Form Page
 app.get("/admin/positions/new", function(req, res){
-    res.render("admin/newposition.ejs", {userFName: req.user[1]});
+    res.render("admin/newposition.ejs", {userFName: req.user[1], userLName: req.user[2]});
 });
 
 // New Position Post Request
 app.post("/admin/positions", function(req, res){
-    var query =     "INSERT INTO position (positionName) VALUES ('"+req.body.positionName+"')";
-    console.log(query);
-    db.query(query, function(err,result){
+    db.query("INSERT INTO position (positionName) VALUES ('"+req.body.positionName+"')", function(err,result){
         console.log("Position Added");
         res.redirect("/admin/positions");
     })
@@ -649,7 +652,8 @@ app.get("/admin/positions/edit/:id", function(req,res){
             res.render("admin/editposition", {
                 positionID:rows[0].positionID,
                 positionName:rows[0].positionName,
-                userFName: req.user[1]
+                userFName: req.user[1],
+                userLName: req.user[2]
             })
         }
     })
