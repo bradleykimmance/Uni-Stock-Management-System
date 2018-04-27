@@ -25,5 +25,30 @@
                 <h1>Currency List</h1>
             </div>
         </header>
+        <p>
+            <a class = "button button-primary" href ="/admin/currencies/new">Add New Position</a>
+        </p>
+
+        <table class="generalTable">
+            <tr>
+                <th>Currency Name</th>
+                <th>Currency Conversion</th>
+                <th>Valid From</th>
+                <th>Valid Until</th>
+            </tr>
+            <% currency.forEach(function(currency){ %>
+            <tr>
+                <td><%=currency.currencyName%></td>
+                <td><%=currency.currencyConvert%></td>
+                <td><%=('0' + currency.validFrom.getDate()).slice(-2) +'/'+ ('0' + (currency.validFrom.getMonth()+1)).slice(-2) +'/'+ currency.validFrom.getFullYear()%></td>
+                <td><%=('0' + currency.validUntil.getDate()).slice(-2) +'/'+ ('0' + (currency.validUntil.getMonth()+1)).slice(-2) +'/'+ currency.validUntil.getFullYear()%></td>
+                <td>
+                    <div>
+                        <a class="editButton" href='/admin/currencies/edit/<%= currency.currencyID %>'>Edit</a>
+                    </div>
+                </td>
+            </tr>
+            <% }) %>
+        </table>
 
 <% include ../partials/footer %>

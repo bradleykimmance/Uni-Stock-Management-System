@@ -404,7 +404,68 @@ app.post("/admin/users", function(req,res){
 
 // Get Currencies Page
 app.get("/admin/currencies", function(req, res) {
-    res.render("admin/currencies", {userFName: req.user[1]});
+    db.query("SELECT * FROM currency", function(err, currency) {
+        if (err) {
+            console.log("Error with showing SQL")
+        } else {
+            res.render("admin/currencies", {currency:currency, userFName: req.user[1]});
+        }
+    });
+});
+
+// Get New Currency Form Page
+app.get("/admin/currencies/new", function(req, res){
+    res.render("admin/newcurrency.ejs", {userFName: req.user[1]});
+});
+
+// New Currency Post Request
+app.post("/admin/currencies", function(req, res){
+    var query  =     "INSERT INTO currency (currencyName, currencyConvert, validFrom, validUntil)";
+    query +=     " VALUES ('"+req.body.currencyName+"', "+req.body.currencyConvert+", ";
+    query +=     "'"+req.body.validFrom+"', '"+req.body.validUntil+"')";
+
+    console.log(query);
+    db.query(query, function(err,result){
+        console.log("Currency Added");
+        res.redirect("/admin/currencies");
+    })
+});
+
+// Edit Currencies Page
+app.get("/admin/currencies/edit/:id", function(req,res){
+    db.query("SELECT * FROM currency WHERE currencyID = "+ req.params.id, function(err, rows){
+        if(err){
+            console.log("Failed to Update Currency");
+            res.redirect("/admin/customers")
+        }
+        if(rows.length <= 0){
+            console.log("Failed to Find Currency");
+            res.redirect("/admin/customers")
+        }
+        else{
+            res.render("admin/editcurrency", {
+                currencyID:rows[0].currencyID,
+                currencyName:rows[0].currencyName,
+                currencyConvert:rows[0].currencyConvert,
+                validFrom:rows[0].validFrom,
+                validUntil:rows[0].validUntil,
+                userFName: req.user[1]
+            })
+        }
+    })
+});
+
+// Update Currency
+app.post("/admin/currencies/edit", function(req, res){
+    var query = "UPDATE currency SET currencyName = '"+req.body.currencyName+"',";
+    query +=        " currencyConvert = "+req.body.currencyConvert+",";
+    query +=        " validFrom = '"+req.body.validFrom+"',";
+    query +=        " validUntil = '"+req.body.validUntil+"'";
+    query +=        " WHERE currencyID = '"+req.body.currencyID+"'";
+    db.query(query, function(err,result){
+        console.log("Currency Updated");
+        res.redirect("/admin/currencies");
+    })
 });
 
 // Get Products Page
