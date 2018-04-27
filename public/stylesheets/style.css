@@ -5,7 +5,7 @@
 #sidebar {
     min-width: 200px;
     max-width: 200px;
-    height: 145vh;
+    height: 150vh;
     background: #02802f;
     color: #fff;
 }
@@ -53,21 +53,21 @@ a, a:hover, a:focus {
     font-size: 1.3em;
 }
 
-#customerTable{
+.generalTable{
     border-collapse: collapse;
     width: 100%;
 }
 
-#customerTable td, #customerTable th {
+.generalTable td, .generalTable th {
     border: 1px solid #ddd;
     padding: 8px;
 }
 
-#customerTable tr:nth-child(even){
+.generalTable tr:nth-child(even){
     background-color: #e5e5e5;
 }
 
-#customerTable th {
+.generalTable th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;

@@ -3,7 +3,6 @@ var express         = require("express");
 var mysql           = require("mysql");
 var passport        = require("passport");
 var LocalStrategy   = require("passport-local").Strategy;
-var methodOverride  = require("method-override");
 var bodyParser      = require("body-parser");
 var crypto          = require("crypto");
 var session         = require("express-session");
@@ -27,7 +26,6 @@ var app = express();
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
-app.use(methodOverride("_method"));
 
 //==================================================================================
 //LOGIN AUTHENTICATION
@@ -228,7 +226,7 @@ app.post("/admin/customers", function(req, res){
 
 // Edit Customer Page
 app.get("/admin/customers/edit/:id", function(req,res){
-    db.query("SELECT * FROM customer WHERE customerID = "+ req.params.id, function(err, rows, fields){
+    db.query("SELECT * FROM customer WHERE customerID = "+ req.params.id, function(err, rows){
         if(err){
             console.log("Failed to Update Customer");
             res.redirect("/admin/customers")
@@ -279,7 +277,113 @@ app.post("/admin/customers/edit", function(req, res){
 
 // Get Stock Page
 app.get("/admin/stock", function(req, res) {
-    res.render("admin/stock", {userFName: req.user[1]});
+    db.query("SELECT * FROM stock", function (err, stock) {
+        if (err) {
+            console.log("Error with showing SQL")
+        } else {
+            console.log(stock);
+            console.log(stock.length);
+            for (var i = 0; i < stock.length; i++) {
+                db.query("SELECT * FROM product WHERE productID = " + stock[i].stock_productID, function (err, product) {
+                    if (err) {
+                        console.log("Error");
+                    }
+                    else {
+                        stock[i].stock_productID = product[0].productName
+                    }
+
+                });
+                db.query("SELECT * FROM currency WHERE currencyID = " + stock[i].stock_currencyID, function (err, currency) {
+                    if (err) {
+                        console.log("Error");
+                    }
+                    else {
+                        stock[i].stock_currencyID = currency[0].currencyName
+                    }
+
+                });
+                db.query("SELECT * FROM customer WHERE customerID = " + stock[i].stock_customerID, function (err, customer) {
+                    if (err) {
+                        console.log("Error");
+                    }
+                    else {
+                        stock[i].stock_customerID = customer[0].customerBusiness;
+                    }
+                })
+            }
+            if (i === stock.length - 1) {
+                console.log(stock[1].stock_productID);
+                res.render("admin/stock", {stock: stock, userFName: req.user[1]})
+            }
+        }
+    })
+});
+
+
+// Get New Stock Page
+app.get("/admin/stock/new", function(req, res){
+    res.render("admin/newstock.ejs", {userFName: req.user[1]});
+});
+
+// New Stock Post Request
+app.post("/admin/stock", function(req, res){
+    var query =     "INSERT INTO stock (";
+    query +=        "quantityStockBought, quantityStockCurrent, priceBought,";
+    query +=        " stock_customerID, stock_currencyID, stock_productID,";
+    query +=        " boughtDate) VALUES ('"+req.body.quantityStockBought+"',";
+    query +=        " '"+req.body.quantityStockBought+"', '"+req.body.priceBought+"',";
+    query +=        " '"+req.body.stock_customerID+"', '"+req.body.stock_currencyID+"',";
+    query +=        " '"+req.body.stock_productID+"', '"+req.body.boughtDate+"')";
+
+    console.log(query);
+    db.query(query, function(err,result){
+        console.log("Stock Added");
+        res.redirect("/admin/stock");
+    })
+});
+
+// Edit Stock Page
+app.get("/admin/stock/edit/:id", function(req,res){
+    db.query("SELECT * FROM stock WHERE stockID = "+ req.params.id, function(err, rows){
+        if(err){
+            console.log("Failed to Update Stock");
+            res.redirect("/admin/stock")
+        }
+        if(rows.length <= 0){
+            console.log("Failed to Find Stock");
+            res.redirect("/admin/stock")
+        }
+        else{
+            res.render("admin/editstock", {
+                stockID:rows[0].stockID,
+                stock_productID:rows[0].stock_productID,
+                quantityStockCurrent:rows[0].stock.quantityStockCurrent,
+                stock_currencyID:rows[0].stock_currencyID,
+                priceBought:rows[0].priceBought,
+                stock_customerID:rows[0].stock_customerID,
+                boughtDate:rows[0].boughtDate,
+                userFName:req.user[1]
+            })
+        }
+    })
+});
+
+// Update Stock
+app.post("/admin/stock/edit", function(req, res){
+    var query =         "UPDATE stock SET";
+    query +=        " stockID = '"+req.body.stockID+"',";
+    query +=        " stock_productID = '"+req.body.stock_productID+"',";
+    query +=        " quantityStockCurrent = '"+req.body.quantityStockCurrent+"',";
+    query +=        " stock_currencyID = '"+req.body.stock_currencyID+"',";
+    query +=        " priceBought = '"+req.body.priceBought+"',";
+    query +=        " stock_customerID = '"+req.body.stock_customerID+"',";
+    query +=        " boughtDate = '"+req.body.boughtDate+"',";
+    query +=        " WHERE stockID = "+req.body.stockID+"";
+
+    db.query(query, function(err,result){
+        console.log("Stock Updated");
+        res.redirect("/admin/stock");
+    })
 });
 
 // Get Invoice Page

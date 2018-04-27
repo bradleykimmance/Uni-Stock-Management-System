@@ -25,5 +25,34 @@
                 <h1>Stock</h1>
             </div>
         </header>
+            <p>
+                <a class = "button button-primary" href ="/admin/stock/new">Add New Stock</a>
+            </p>
+
+            <table class="generalTable">
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Currency</th>
+                    <th>Cost</th>
+                    <th>Date Bought</th>
+                    <th>Bought From</th>
+                </tr>
+                <% stock.forEach(function(stock){ %>
+                <tr>
+                    <td><%=stock.stock_productID%></td>
+                    <td><%=stock.quantityStockCurrent%></td>
+                    <td><%=stock.stock_currencyID%></td>
+                    <td><%=stock.priceBought%></td>
+                    <td><%=stock.boughtDate%></td>
+                    <td><%=stock.stock_customerID%></td>
+                    <td>
+                        <div>
+                            <a class="editButton" href='/admin/stock/edit/<%= stock.stockID %>'>Edit</a>
+                        </div>
+                    </td>
+                </tr>
+                <% }) %>
+            </table>
 
 <% include ../partials/footer %>
