@@ -25,5 +25,30 @@
                 <h1>Products</h1>
             </div>
         </header>
+        <p>
+            <a class = "button button-primary" href ="/admin/products/new">Add New Position</a>
+        </p>
+
+        <table class="generalTable">
+            <tr>
+                <th>Product Name</th>
+                <th>Product State</th>
+                <th>Product Platform</th>
+                <th>Product Category</th>
+            </tr>
+            <% product.forEach(function(product){ %>
+            <tr>
+                <td><%=product.productName%></td>
+                <td><%=product.productState%></td>
+                <td><%=product.productPlatform%></td>
+                <td><%=product.productCategory%></td>
+                <td>
+                    <div>
+                        <a class="editButton" href='/admin/products/edit/<%= product.productID %>'>Edit</a>
+                    </div>
+                </td>
+            </tr>
+            <% }) %>
+        </table>
 
 <% include ../partials/footer %>

@@ -215,7 +215,7 @@ app.post("/admin/customers", function(req, res){
     query +=        ", '"+req.body.customerAddress2+"', '"+req.body.customerAddress3+"'";
     query +=        ", '"+req.body.customerCountry+"', '"+req.body.customerNumber+"'";
     query +=        ", '"+req.body.customerVAT+"', '"+req.body.customerEmail+"'";
-    query +=        ", '"+req.body.customerEmailCC+"', '"+req.body.customerPhone+"')"
+    query +=        ", '"+req.body.customerEmailCC+"', '"+req.body.customerPhone+"')";
 
     console.log(query);
     db.query(query, function(err,result){
@@ -363,7 +363,6 @@ app.post("/admin/stock/edit", function(req, res){
     query +=        " WHERE stockID = "+req.body.stockID+"";
 
     db.query(query, function(err,result){
-        console.log(query);
         res.redirect("/admin/stock");
     })
 });
@@ -410,14 +409,123 @@ app.get("/admin/currencies", function(req, res) {
 
 // Get Products Page
 app.get("/admin/products", function(req, res) {
-    res.render("admin/products", {userFName: req.user[1]});
+    db.query("SELECT * FROM product", function(err, product) {
+        if (err) {
+            console.log("Error with showing SQL")
+        } else {
+            res.render("admin/products", {product:product, userFName: req.user[1]});
+        }
+    });
+});
+
+// Get New Product Form Page
+app.get("/admin/products/new", function(req, res){
+    res.render("admin/newproduct.ejs", {userFName: req.user[1]});
+});
+
+// New Product Post Request
+app.post("/admin/products", function(req, res){
+    var query  =     "INSERT INTO product (productName, productState, productPlatform, productCategory)";
+        query +=     " VALUES ('"+req.body.productName+"', '"+req.body.productState+"', ";
+        query +=     "'"+req.body.productPlatform+"', '"+req.body.productCategory+"')";
+
+    db.query(query, function(err,result){
+        console.log("Product Added");
+        res.redirect("/admin/products");
+    })
+});
+
+// Edit Product Page
+app.get("/admin/products/edit/:id", function(req,res){
+    db.query("SELECT * FROM product WHERE productID = "+ req.params.id, function(err, rows){
+        if(err){
+            console.log("Failed to Update Product");
+            res.redirect("/admin/customers")
+        }
+        if(rows.length <= 0){
+            console.log("Failed to Find Product");
+            res.redirect("/admin/customers")
+        }
+        else{
+            res.render("admin/editproduct", {
+                productID:rows[0].productID,
+                productName:rows[0].productName,
+                productState:rows[0].productState,
+                productPlatform:rows[0].productPlatform,
+                productCategory:rows[0].productCategory,
+                userFName: req.user[1]
+            })
+        }
+    })
+});
+
+// Update Product
+app.post("/admin/products/edit", function(req, res){
+    var query = "UPDATE product SET productName = '"+req.body.productName+"',";
+        query +=        " productState = '"+req.body.productState+"',";
+        query +=        " productPlatform = '"+req.body.productPlatform+"',";
+        query +=        " productCategory = '"+req.body.productCategory+"'";
+        query +=        " WHERE productID = '"+req.body.productID+"'";
+    db.query(query, function(err,result){
+        console.log("Product Updated");
+        res.redirect("/admin/products");
+    })
 });
 
 // Get Positions Page
 app.get("/admin/positions", function(req, res) {
-    res.render("admin/positions", {userFName: req.user[1]});
+    db.query("SELECT * FROM position", function(err, position) {
+        if (err) {
+            console.log("Error with showing SQL")
+        } else {
+            res.render("admin/positions", {position:position, userFName: req.user[1]});
+        }
+    });
 });
 
+// Get New Position Form Page
+app.get("/admin/positions/new", function(req, res){
+    res.render("admin/newposition.ejs", {userFName: req.user[1]});
+});
+
+// New Position Post Request
+app.post("/admin/positions", function(req, res){
+    var query =     "INSERT INTO position (positionName) VALUES ('"+req.body.positionName+"')";
+    console.log(query);
+    db.query(query, function(err,result){
+        console.log("Position Added");
+        res.redirect("/admin/positions");
+    })
+});
+
+// Edit Positions Page
+app.get("/admin/positions/edit/:id", function(req,res){
+    db.query("SELECT * FROM position WHERE positionID = "+ req.params.id, function(err, rows){
+        if(err){
+            console.log("Failed to Update Position");
+            res.redirect("/admin/customers")
+        }
+        if(rows.length <= 0){
+            console.log("Failed to Find Position");
+            res.redirect("/admin/customers")
+        }
+        else{
+            res.render("admin/editposition", {
+                positionID:rows[0].positionID,
+                positionName:rows[0].positionName,
+                userFName: req.user[1]
+            })
+        }
+    })
+});
+
+// Update Position
+app.post("/admin/positions/edit", function(req, res){
+    db.query("UPDATE position SET positionName = '"+req.body.positionName+"' WHERE positionID = "+req.body.positionID+"", function(err,result){
+        console.log("Position Updated");
+        res.redirect("/admin/positions");
+    })
+});
 //==================================================================================
 //Start Server
 //==================================================================================

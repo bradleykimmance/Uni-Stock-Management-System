@@ -1,0 +1,58 @@
+<% include ../partials/adminHeader %>
+
+<div class="wrapper">
+
+    <nav id="sidebar">
+        <!-- Sidebar Links -->
+        <ul class="list-unstyled components">
+            <li><a href="/admin/home">Dashboard</a></li>
+            <li><a href="/admin/customers">Customers</a></li>
+            <li><a href="/admin/stock">Stock</a></li>
+            <li><a href="/admin/invoices">Invoices</a></li>
+            <li><a href="/admin/creditnotes">Credit Notes</a></li>
+            <li><a href="/admin/offers">Offers</a></li>
+            <li><a href="/admin/reports">Reports</a></li>
+            <li><a href="/admin/users">Users</a></li>
+            <li><a href="/admin/currencies">Currencies</a></li>
+            <li class="active"><a href="/admin/products">Products</a></li>
+            <li><a href="/admin/positions">Positions</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <header class="jumbotron">
+            <div class="container">
+                <h1>New Product</h1>
+            </div>
+        </header>
+
+
+    <form class = "form-center" action="/admin/products" method="POST">
+        <div class="form-group row">
+            <label for="productName" class="col-2 col-form-label">Product Name:</label>
+            <div class="col-4">
+                <input type="text" class="form-control" name = "productName" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="productState" class="col-2 col-form-label">Product State:</label>
+            <div class="col-4">
+                <input type="text" class="form-control" name = "productState" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="productPlatform" class="col-2 col-form-label">Product Platform:</label>
+            <div class="col-4">
+                <input type="text" class="form-control" name = "productPlatform" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="productCategory" class="col-2 col-form-label">Product Category</label>
+            <div class="col-4">
+                <input type="text" class="form-control" name = "productCategory" required>
+            </div>
+        </div>
+        <button class = "button button-primary button-form">Submit!</button>
+    </form>
+
+
+<% include ../partials/footer %>

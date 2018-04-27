@@ -21,29 +21,20 @@
     <div class="container">
         <header class="jumbotron">
             <div class="container">
-                <h1>Positions</h1>
+                <h1>Create a new Position</h1>
             </div>
         </header>
-        <p>
-            <a class = "button button-primary" href ="/admin/positions/new">Add New Position</a>
-        </p>
 
-        <table class="generalTable">
-            <tr>
-                <th>Position</th>
-            </tr>
-            <% position.forEach(function(position){ %>
-                <tr>
-                    <td><%=position.positionName%></td>
-                    <td>
-                        <div>
-                            <a class="editButton" href='/admin/positions/edit/<%= position.positionID %>'>Edit</a>
-                        </div>
-                    </td>
-                </tr>
-            <% }) %>
-        </table>
 
+    <form class = "form-center" action="/admin/positions" method="POST">
+        <div class="form-group row">
+            <label for="positionName" class="col-2 col-form-label">Position Name:</label>
+            <div class="col-4">
+                <input type="text" class="form-control" name = "positionName" required autofocus>
+            </div>
+        </div>
+        <button class = "button button-primary button-form">Submit!</button>
+    </form>
 
 
 <% include ../partials/footer %>
