@@ -381,8 +381,97 @@ app.get("/admin/creditnotes", function(req, res) {
 
 // Get Offers Page
 app.get("/admin/offers", function(req, res) {
-    res.render("admin/offers", {userFName: req.user[1],userLName: req.user[2]});
+    db.query("SELECT * FROM offer JOIN product ON offer.offer_productID = productID JOIN currency ON offer.offer_currencyID = currencyID JOIN customer ON offer.offer_customerID = customerID", function (err, offer) {
+        if (err) {
+            console.log("Error with showing SQL")
+        }
+        else {
+            res.render("admin/offers.ejs", {offer:offer, userFName: req.user[1],userLName: req.user[2]});
+        }
+    })
 });
+
+// Get New Offer Page
+app.get("/admin/offers/new", function(req, res){
+    db.query("SELECT * FROM product", function(err, product){
+        db.query("SELECT * FROM customer", function(err, customer){
+            db.query("SELECT * FROM currency", function(err, currency){
+                res.render("admin/newoffer.ejs", {product:product, customer:customer, currency:currency, userFName: req.user[1],userLName: req.user[2]});
+            })
+        })
+    });
+});
+
+// New Offer Post Request
+app.post("/admin/offers", function(req, res){
+    var query =     "INSERT INTO offer (";
+    query +=        "quantityOffer, priceOffer,";
+    query +=        " offer_customerID, offer_currencyID, offer_productID,";
+    query +=        " dateOffer) VALUES ('"+req.body.quantityOffer+"',";
+    query +=        " '"+req.body.priceOffer+"',";
+    query +=        " '"+req.body.offer_customerID+"', '"+req.body.offer_currencyID+"',";
+    query +=        " '"+req.body.offer_productID+"', '"+req.body.dateOffer+"')";
+
+    console.log(query);
+    db.query(query, function(err,result){
+        console.log("Offer Added");
+        res.redirect("/admin/offers");
+    })
+});
+
+// Edit Offer Page
+app.get("/admin/offers/edit/:id", function(req,res){
+    db.query("SELECT * FROM offer WHERE offerID = "+ req.params.id, function(err, rows){
+        if(err){
+            console.log("Failed to Update Offer");
+            res.redirect("/admin/offers")
+        }
+        if(rows.length <= 0){
+            console.log("Failed to Find Offer");
+            res.redirect("/admin/offers")
+        }
+        else{
+            db.query("SELECT * FROM product", function(err, product) {
+                db.query("SELECT * FROM customer", function (err, customer) {
+                    db.query("SELECT * FROM currency", function (err, currency) {
+                        res.render("admin/editoffer", {
+                            product: product,
+                            customer: customer,
+                            currency: currency,
+                            offerID: rows[0].offerID,
+                            offer_productID: rows[0].offer_productID,
+                            quantityOffer: rows[0].quantityOffer,
+                            offer_currencyID: rows[0].offer_currencyID,
+                            priceOffer: rows[0].priceOffer,
+                            offer_customerID: rows[0].offer_customerID,
+                            dateOffer: rows[0].dateOffer,
+                            userFName: req.user[1],
+                            userLName: req.user[2]
+                        })
+                    })
+                })
+            })
+        }
+    })
+});
+
+// Update Offer
+app.post("/admin/offers/edit", function(req, res){
+    var query =         "UPDATE offer SET";
+    query +=        " offer_productID = '"+req.body.offer_productID+"',";
+    query +=        " quantityOffer = '"+req.body.quantityOffer+"',";
+    query +=        " offer_currencyID = '"+req.body.offer_currencyID+"',";
+    query +=        " priceOffer = '"+req.body.priceOffer+"',";
+    query +=        " offer_customerID = '"+req.body.offer_customerID+"',";
+    query +=        " dateOffer = '"+req.body.dateOffer+"'";
+    query +=        " WHERE offerID = "+req.body.offerID+"";
+
+    db.query(query, function(err,result){
+        res.redirect("/admin/offers");
+    })
+});
+
+
 
 // Get Reports Page
 app.get("/admin/reports", function(req, res) {
