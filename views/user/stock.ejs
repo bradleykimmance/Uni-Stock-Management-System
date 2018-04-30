@@ -22,4 +22,24 @@
             </div>
         </header>
 
+        <table class="generalTable">
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Currency</th>
+                <th>Cost</th>
+                <th>Date Bought</th>
+                <th>Bought From</th>
+            </tr>
+            <% stock.forEach(function(stock){ %>
+            <tr>
+                <td><%=stock.productName%></td>
+                <td><%=stock.quantityStockCurrent%></td>
+                <td><%=stock.currencyName%></td>
+                <td><%=stock.priceBought%></td>
+                <td><%=('0' + stock.boughtDate.getDate()).slice(-2) +'/'+ ('0' + (stock.boughtDate.getMonth()+1)).slice(-2) +'/'+ stock.boughtDate.getFullYear()%></td>
+                <td><%=stock.customerBusiness%></td>
+            </tr>
+            <% }) %>
+        </table>
 <% include ../partials/footer %>

@@ -115,3 +115,47 @@ a, a:hover, a:focus {
     width: 90%;
     margin: 0 auto;
 }
+
+.reportTable{
+    border-collapse: collapse;
+    width: 50%;
+    float: left;
+}
+
+.reportTable td, .reportTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.reportTable tr:nth-child(even){
+    background-color: #e5e5e5;
+}
+
+.reportTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #02802f;
+    color: white;
+}
+
+.totalTable{
+    border-collapse: collapse;
+    width: 20%;
+    position: absolute;
+    bottom:75px;
+    margin-left:25%;
+}
+
+.totalTable td, .reportTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.totalTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #02802f;
+    color: white;
+}

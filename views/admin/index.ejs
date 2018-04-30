@@ -26,5 +26,82 @@
             </div>
         </header>
 
+        <table class="reportTable">
+            <tr>
+                <th>Invoice Number</th>
+                <th>Invoice Date</th>
+                <th>Currency</th>
+                <th>Total Profit</th>
+                <th>Sale By</th>
+            </tr>
+            <% var invoiceID = 0 %>
+            <% var totalProfit = 0 %>
+            <% invoice.forEach(function(invoice){ %>
+            <% if(invoiceID === invoice.invoiceNo){%>
 
-<% include ../partials/footer %>
+            <% totalProfit = totalProfit + ((invoice.priceSold * invoice.stockQuantity * invoice.currencyConvert)-(invoice.priceBought * invoice.stockQuantity * invoice.currencyConvert))%>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><%= ((invoice.priceSold * invoice.stockQuantity * invoice.currencyConvert)-(invoice.priceBought * invoice.stockQuantity * invoice.currencyConvert))%></td>
+            <td></td>
+
+            <% }else{%>
+            <% totalProfit = totalProfit + ((invoice.priceSold * invoice.stockQuantity * invoice.currencyConvert)-(invoice.priceBought * invoice.stockQuantity * invoice.currencyConvert))%>
+            <tr>
+                <td><%=invoice.invoiceNo%></td>
+                <td><%=('0' + invoice.invoiceDate.getDate()).slice(-2) +'/'+ ('0' + (invoice.invoiceDate.getMonth()+1)).slice(-2) +'/'+ invoice.invoiceDate.getFullYear()%></td>
+                <td>GBP</td>
+                <td><%=((invoice.priceSold * invoice.stockQuantity * invoice.currencyConvert)-(invoice.priceBought * invoice.stockQuantity * invoice.currencyConvert))%></td>
+                <td><%=invoice.fName%></td>
+            </tr>
+            <%}%>
+            <% invoiceID = invoice.invoiceNo %>
+            <% }) %>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Total Invoice Profit:</td>
+                <td><%= totalProfit %></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <table class="reportTable">
+            <tr>
+                <th>Credit Note Number</th>
+                <th>Credit Date</th>
+                <th>Currency</th>
+                <th>Total Credit</th>
+                <th>Credit By</th>
+            </tr>
+            <% var totalCredit = 0 %>
+            <% credit_note.forEach(function(credit_note){ %>
+
+            <% totalCredit = totalCredit + ((credit_note.priceCredit * credit_note.stockQuantity * credit_note.currencyConvert)-(credit_note.priceBought * credit_note.stockQuantity * credit_note.currencyConvert))%>
+            <tr>
+                <td><%=credit_note.creditNo%></td>
+                <td><%=('0' + (credit_note.creditDate).getDate()).slice(-2) +'/'+ ('0' + ((credit_note.creditDate).getMonth()+1)).slice(-2) +'/'+ (credit_note.creditDate).getFullYear()%></td>
+                <td>GBP</td>
+                <td><%=((credit_note.priceCredit * credit_note.stockQuantity * credit_note.currencyConvert)-(credit_note.priceBought * credit_note.stockQuantity * credit_note.currencyConvert))%></td>
+                <td><%=credit_note.fName%></td>
+            </tr>
+            <% }) %>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Total Credit:</td>
+                <td><%= totalCredit %></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <table class="totalTable">
+            <tr>
+                <th>Total GBP Profit:</th>
+                <th><%= (totalProfit - totalCredit) %></th>
+            </tr>
+        </table>
+
+
+<% include ../partials/indexFooter %>

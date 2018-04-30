@@ -1,0 +1,106 @@
+<% include ../partials/adminHeader %>
+
+<div class="wrapper">
+
+    <nav id="sidebar">
+        <!-- Sidebar Links -->
+        <ul class="list-unstyled components">
+            <li><a href="/admin/home">Dashboard</a></li>
+            <li><a href="/admin/customers">Customers</a></li>
+            <li><a href="/admin/stock">Stock</a></li>
+            <li><a href="/admin/invoices">Invoices</a></li>
+            <li class="active"><a href="/admin/creditnotes">Credit Notes</a></li>
+            <li><a href="/admin/offers">Offers</a></li>
+            <li><a href="/admin/reports">Reports</a></li>
+            <li><a href="/admin/users">Users</a></li>
+            <li><a href="/admin/currencies">Currencies</a></li>
+            <li><a href="/admin/products">Products</a></li>
+            <li><a href="/admin/positions">Positions</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <header class="jumbotron">
+            <div class="container">
+                <h1>New Credit Note</h1>
+            </div>
+        </header>
+
+
+    <form class = "form-center" action="/admin/creditnotes" method="POST">
+        <input type="hidden" name="last_creditNo" value="<%= lastCredit %>">
+        <div class="form-group row">
+            <input type="hidden" name="credit_userID" value="<%= userID %>">
+            <label for="credit_customerID" class="col-2 col-form-label">Select Customer:</label>
+            <div class="col-4">
+                <select class="form-control" name="credit_customerID" required>
+                    <option disabled selected value></option>
+                    <% customer.forEach(function(customer){ %>
+                    <option value ="<%= customer.customerID%>"> <%= customer.customerBusiness%> </option>
+                    <%})%>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="creditDate" class="col-2 col-form-label">Credit Note Date:</label>
+            <div class="col-4">
+                <input type="date" class="form-control" name = "creditDate" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="creditDueDate" class="col-2 col-form-label">Credit Note Due Date:</label>
+            <div class="col-4">
+                <input type="date" class="form-control" name = "creditDueDate" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="credit_currencyID" class="col-2 col-form-label">Select Currency:</label>
+            <div class="col-4">
+                <select class="form-control" name="credit_currencyID" required>
+                    <option disabled selected value></option>
+                    <% currency.forEach(function(currency){ %>
+                    <option value ="<%= currency.currencyID%>" > <%= currency.currencyName%> </option>
+                    <%})%>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="credit_stockID" class="col-2 col-form-label">Select Stock:</label>
+            <div class="col-4">
+                <select class="form-control" name="credit_stockID" required>
+                    <option disabled selected value></option>
+                    <% stock.forEach(function(stock){ %>
+                    <option value ="<%= stock.stockID%>"> <%= stock.productName%> </option>
+                    <%})%>
+                </select>
+            </div>
+            <label for="credit_stockQty" class="col-2 col-form-label">Quantity:</label>
+            <div class="col-4">
+                <input type="number" class="form-control" name = "credit_stockQty" required>
+            </div>
+            <label for="credit_stockPrice" class="col-2 col-form-label">Credit:</label>
+            <div class="col-4">
+                <input type="number" step="0.01" class="form-control" name = "credit_stockPrice" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="credit_vatID" class="col-2 col-form-label">VAT Rate:</label>
+            <div class="col-4">
+                <select class="form-control" name="credit_vatID" required>
+                    <option disabled selected value></option>
+                    <% vat.forEach(function(vat){ %>
+                    <option value ="<%= vat.vatID%>"> <%= vat.vatRate%> </option>
+                    <%})%>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="creditAdjustments" class="col-2 col-form-label">Adjustments:</label>
+            <div class="col-4">
+                <input type="number" step="0.01" class="form-control" value = "0" name = "creditAdjustments" required>
+            </div>
+        </div>
+        <button class = "button button-primary button-form">Submit!</button>
+    </form>
+
+
+<% include ../partials/footer %>

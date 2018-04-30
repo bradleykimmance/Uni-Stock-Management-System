@@ -138,7 +138,19 @@ app.get("/", function(req, res){
 
 // Get User Homepage
 app.get("/user", isAuthenticated, function(req, res) {
-    res.render("user/index", {userFName: req.user[1],userLName: req.user[2]});
+    db.query("SELECT * FROM invoice JOIN invoice_stock ON invoice.invoiceNo = join_invoiceNo JOIN stock ON invoice_stock.join_stockID = stockID JOIN currency ON invoice.invoice_currencyID = currencyID JOIN account ON invoice.invoice_userID = userID WHERE invoice_userID ="+req.user[0]+ "", function(err,invoice){
+        db.query("SELECT * FROM credit_note JOIN credit_stock ON credit_note.creditNo = join_creditNo JOIN stock ON credit_stock.join_stockID = stockID JOIN currency ON credit_note.credit_currencyID = currencyID JOIN account ON credit_note.credit_userID = userID WHERE credit_userID ="+req.user[0]+ "", function(err,credit_note){
+            db.query("SELECT * FROM stock JOIN currency ON stock.stock_currencyID = currencyID", function(err, stock) {
+                res.render("user/index", {
+                    invoice: invoice,
+                    credit_note: credit_note,
+                    stock:stock,
+                    userFName: req.user[1],
+                    userLName: req.user[2]
+                });
+            })
+        })
+    })
 });
 
 // Get Customer Page
@@ -154,27 +166,209 @@ app.get("/customers", isAuthenticated, function(req, res, next) {
 
 // Get Stock Page
 app.get("/stock", isAuthenticated, function(req, res) {
-    res.render("user/stock", {userFName: req.user[1],userLName: req.user[2]});
+    db.query("SELECT * FROM stock JOIN product ON stock.stock_productID = productID JOIN currency ON stock.stock_currencyID = currencyID JOIN customer ON stock.stock_customerID = customerID WHERE stock.quantityStockCurrent > 0", function (err, stock) {
+        if (err) {
+            console.log("Error with showing SQL")
+        }
+        else {
+            res.render("user/stock.ejs", {stock:stock, userFName: req.user[1],userLName: req.user[2]});
+        }
+    })
 });
 
 // Get Invoice Page
 app.get("/invoices", isAuthenticated, function(req, res) {
-    res.render("user/invoices", {userFName: req.user[1],userLName: req.user[2]});
+    var query =     "SELECT * FROM invoice JOIN account ON invoice.invoice_userID = userID JOIN currency ON invoice.invoice_currencyID = currencyID";
+    query +=    " JOIN customer ON invoice.invoice_customerID = customerID JOIN vat ON invoice.invoice_vatID = vatID";
+    query +=    " JOIN invoice_stock ON invoice.invoiceNo = join_invoiceNo JOIN stock ON invoice_stock.join_stockID = stockID";
+    query +=    " JOIN product ON stock.stock_productID = productID WHERE invoice.invoice_userID = "+req.user[0]+"";
+
+    db.query(query, function (err, invoice) {
+        if (err) {
+            console.log("Error with showing SQL")
+        }
+        else {
+            res.render("user/invoices.ejs", {invoice:invoice, userFName: req.user[1],userLName: req.user[2]});
+        }
+    })
+});
+
+// Get New Invoice Page
+app.get("/invoices/new", function(req, res){
+    db.query("SELECT * FROM customer", function(err, customer){
+        db.query("SELECT * FROM vat", function(err, vat){
+            db.query("SELECT * FROM stock JOIN product ON stock_productID = productID WHERE quantityStockCurrent > 0", function(err, stock){
+                db.query("SELECT * FROM currency", function(err, currency) {
+                    db.query("SELECT * FROM invoice ORDER BY invoiceNo DESC LIMIT 1", function(err, lastInvoice) {
+                        res.render("user/newinvoice.ejs", {
+                            vat: vat,
+                            customer: customer,
+                            currency: currency,
+                            stock: stock,
+                            lastInvoice: lastInvoice[0].invoiceNo,
+                            userID: req.user[0],
+                            userFName: req.user[1],
+                            userLName: req.user[2]
+                        });
+                    })
+                })
+            })
+        })
+    });
+});
+
+// New Invoice Post Request
+app.post("/invoices", function(req, res){
+    var lastInvoiceNo = Number(req.body.last_invoiceNo) + 1;
+    var query =     "INSERT INTO invoice (";
+    query +=        "invoice_customerID, invoice_userID, saleVoid, invoiceDate,";
+    query +=        " invoiceDueDate, invoice_vatID, invoiceAdjustments, invoice_currencyID)";
+    query +=        " VALUES ('"+req.body.invoice_customerID+"', '"+req.body.invoice_userID+"',";
+    query +=        " '"+req.body.saleVoid+"', '"+req.body.invoiceDate+"',";
+    query +=        " '"+req.body.invoiceDueDate+"', '"+req.body.invoice_vatID+"',";
+    query +=        " '"+req.body.invoiceAdjustments+"', '"+req.body.invoice_currencyID+"')";
+
+    db.query(query, function(err,result){
+        if(req.body.invoice_stockQty2 < 1) {
+            var query2 = "INSERT INTO invoice_stock (";
+            query2 += "join_invoiceNo, join_stockID, stockQuantity, priceSold)";
+            query2 += " VALUES ('" +lastInvoiceNo+ "', '" + req.body.invoice_stockID1 + "',";
+            query2 += " '" + req.body.invoice_stockQty1 + "', '" + req.body.invoice_stockPrice1 + "')";
+
+            db.query(query2, function(err,result) {
+                var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent - ";
+                query3 +=    "'"+req.body.invoice_stockQty1+"' WHERE stockID = '"+req.body.invoice_stockID1+"'";
+
+                db.query(query3, function(err, result) {
+                    console.log("Invoice Added");
+                    res.redirect("/invoices");
+                })
+            })
+        }else{
+            var query2 = "INSERT INTO invoice_stock (";
+            query2 += "join_invoiceNo, join_stockID, stockQuantity, priceSold)";
+            query2 += " VALUES ('" +lastInvoiceNo+ "', '" + req.body.invoice_stockID1 + "',";
+            query2 += " '" + req.body.invoice_stockQty1 + "', '" + req.body.invoice_stockPrice1 + "'),";
+            query2 += " ('" +lastInvoiceNo+ "', '" + req.body.invoice_stockID2 + "',";
+            query2 += " '" +req.body.invoice_stockQty2+ "', '" + req.body.invoice_stockPrice2 + "')";
+
+            console.log(query2);
+            db.query(query2, function(err,result) {
+                var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent - ";
+                query3 +=    "'"+req.body.invoice_stockQty1+"' WHERE stockID = '"+req.body.invoice_stockID1+"'";
+
+                db.query(query3, function(err, result) {
+                    var query4 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent - ";
+                    query4 +=    "'"+req.body.invoice_stockQty2+"' WHERE stockID = '"+req.body.invoice_stockID2+"'";
+
+                    db.query(query4, function(err, result) {
+                        console.log("Invoice Added");
+                        res.redirect("/invoices");
+                    })
+                })
+            })
+        }
+    })
 });
 
 // Get Credit Note Page
 app.get("/creditnotes", isAuthenticated, function(req, res) {
-    res.render("user/credit_notes", {userFName: req.user[1],userLName: req.user[2]});
+    var query = "SELECT * FROM credit_note JOIN account ON credit_note.credit_userID = userID JOIN currency ON credit_note.credit_currencyID = currencyID";
+    query +=    " JOIN customer ON credit_note.credit_customerID = customerID JOIN vat ON credit_note.credit_vatID = vatID";
+    query +=    " JOIN credit_stock ON credit_note.creditNo = join_creditNo JOIN stock ON credit_stock.join_stockID = stockID";
+    query +=    " JOIN product ON stock.stock_productID = productID WHERE credit_note.credit_userID = "+req.user[0]+"";
+
+    db.query(query, function (err, credit_note) {
+        if (err) {
+            console.log("Error with showing SQL")
+        }
+        else {
+            res.render("user/credit_notes.ejs", {credit_note:credit_note, userFName: req.user[1],userLName: req.user[2]});
+        }
+    })
+});
+
+// Get New Credit Notes Page
+app.get("/creditnotes/new", function(req, res){
+    db.query("SELECT * FROM customer", function(err, customer){
+        db.query("SELECT * FROM vat", function(err, vat){
+            db.query("SELECT * FROM stock JOIN product ON stock_productID = productID", function(err, stock){
+                db.query("SELECT * FROM currency", function(err, currency) {
+                    db.query("SELECT * FROM credit_note ORDER BY creditNo DESC LIMIT 1", function(err, lastCredit) {
+                        res.render("user/newcreditnote.ejs", {
+                            vat: vat,
+                            customer: customer,
+                            currency: currency,
+                            stock: stock,
+                            lastCredit: lastCredit[0].creditNo,
+                            userID: req.user[0],
+                            userFName: req.user[1],
+                            userLName: req.user[2]
+                        });
+                    })
+                })
+            })
+        })
+    });
+});
+
+// New Credit Note Post Request
+app.post("/creditnotes", function(req, res){
+    var lastCreditNo = Number(req.body.last_creditNo) + 1;
+    var query =     "INSERT INTO credit_note (";
+    query +=        "credit_customerID, credit_userID, creditDate,";
+    query +=        " creditDueDate, credit_vatID, creditAdjustments, credit_currencyID)";
+    query +=        " VALUES ('"+req.body.credit_customerID+"', '"+req.body.credit_userID+"',";
+    query +=        " '"+req.body.creditDate+"',";
+    query +=        " '"+req.body.creditDueDate+"', '"+req.body.credit_vatID+"',";
+    query +=        " '"+req.body.creditAdjustments+"', '"+req.body.credit_currencyID+"')";
+
+    db.query(query, function(err,result) {
+        var query2 = "INSERT INTO credit_stock (";
+        query2 += "join_creditNo, join_stockID, stockQuantity, priceCredit)";
+        query2 += " VALUES ('" + lastCreditNo + "', '" + req.body.credit_stockID + "',";
+        query2 += " '" + req.body.credit_stockQty + "', '" + req.body.credit_stockPrice + "')";
+
+        console.log(query2);
+        db.query(query2, function (err, result) {
+            var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent + ";
+            query3 += "'" + req.body.credit_stockQty + "' WHERE stockID = '" + req.body.credit_stockID + "'";
+
+            db.query(query3, function (err, result) {
+                console.log("Credit Note Added");
+                res.redirect("/creditnotes");
+            })
+        })
+    });
 });
 
 // Get Offers Page
 app.get("/offers", isAuthenticated, function(req, res) {
-    res.render("user/offers", {userFName: req.user[1],userLName: req.user[2]});
+    db.query("SELECT * FROM offer JOIN product ON offer.offer_productID = productID JOIN currency ON offer.offer_currencyID = currencyID JOIN customer ON offer.offer_customerID = customerID", function (err, offer) {
+        if (err) {
+            console.log("Error with showing SQL")
+        }
+        else {
+            res.render("user/offers.ejs", {offer:offer, userFName: req.user[1],userLName: req.user[2]});
+        }
+    })
 });
 
 // Get Reports Page
 app.get("/reports", isAuthenticated, function(req, res) {
-    res.render("user/reports", {userFName: req.user[1],userLName: req.user[2]});
+    db.query("SELECT * FROM invoice JOIN invoice_stock ON invoice.invoiceNo = join_invoiceNo JOIN stock ON invoice_stock.join_stockID = stockID JOIN currency ON invoice.invoice_currencyID = currencyID JOIN account ON invoice.invoice_userID = userID WHERE invoice_userID ="+req.user[0]+ "", function(err,invoice){
+        db.query("SELECT * FROM credit_note JOIN credit_stock ON credit_note.creditNo = join_creditNo JOIN stock ON credit_stock.join_stockID = stockID JOIN currency ON credit_note.credit_currencyID = currencyID JOIN account ON credit_note.credit_userID = userID WHERE credit_userID ="+req.user[0]+ "", function(err,credit_note){
+            db.query("SELECT * FROM stock JOIN currency ON stock.stock_currencyID = currencyID", function(err, stock) {
+                res.render("user/reports", {
+                    invoice: invoice,
+                    credit_note: credit_note,
+                    stock:stock,
+                    userFName: req.user[1],
+                    userLName: req.user[2]
+                });
+            })
+        })
+    })
 });
 
 //==================================================================================
@@ -186,7 +380,19 @@ app.all('/admin/*', isAdmin);
 
 // Get Admin Homepage
 app.get("/admin/home", function(req, res) {
-    res.render("admin/index", {userFName: req.user[1],userLName: req.user[2]});
+    db.query("SELECT * FROM invoice JOIN invoice_stock ON invoice.invoiceNo = join_invoiceNo JOIN stock ON invoice_stock.join_stockID = stockID JOIN currency ON invoice.invoice_currencyID = currencyID JOIN account ON invoice.invoice_userID = userID", function(err,invoice){
+        db.query("SELECT * FROM credit_note JOIN credit_stock ON credit_note.creditNo = join_creditNo JOIN stock ON credit_stock.join_stockID = stockID JOIN currency ON credit_note.credit_currencyID = currencyID JOIN account ON credit_note.credit_userID = userID", function(err,credit_note){
+            db.query("SELECT * FROM stock JOIN currency ON stock.stock_currencyID = currencyID", function(err, stock) {
+                res.render("admin/index", {
+                    invoice: invoice,
+                    credit_note: credit_note,
+                    stock:stock,
+                    userFName: req.user[1],
+                    userLName: req.user[2]
+                });
+            })
+        })
+    })
 });
 
 // Get Customer Page
@@ -310,7 +516,6 @@ app.post("/admin/stock", function(req, res){
     query +=        " '"+req.body.stock_customerID+"', '"+req.body.stock_currencyID+"',";
     query +=        " '"+req.body.stock_productID+"', '"+req.body.boughtDate+"')";
 
-    console.log(query);
     db.query(query, function(err,result){
         console.log("Stock Added");
         res.redirect("/admin/stock");
@@ -371,12 +576,250 @@ app.post("/admin/stock/edit", function(req, res){
 
 // Get Invoice Page
 app.get("/admin/invoices", function(req, res) {
-    res.render("admin/invoices", {userFName: req.user[1],userLName: req.user[2]});
+    var query =     "SELECT * FROM invoice JOIN account ON invoice.invoice_userID = userID JOIN currency ON invoice.invoice_currencyID = currencyID";
+        query +=    " JOIN customer ON invoice.invoice_customerID = customerID JOIN vat ON invoice.invoice_vatID = vatID";
+        query +=    " JOIN invoice_stock ON invoice.invoiceNo = join_invoiceNo JOIN stock ON invoice_stock.join_stockID = stockID";
+        query +=    " JOIN product ON stock.stock_productID = productID";
+
+    db.query(query, function (err, invoice) {
+        if (err) {
+            console.log("Error with showing SQL")
+        }
+        else {
+            res.render("admin/invoices.ejs", {invoice:invoice, userFName: req.user[1],userLName: req.user[2]});
+        }
+    })
 });
 
+// Get New Invoice Page
+app.get("/admin/invoices/new", function(req, res){
+    db.query("SELECT * FROM customer", function(err, customer){
+        db.query("SELECT * FROM vat", function(err, vat){
+            db.query("SELECT * FROM stock JOIN product ON stock_productID = productID WHERE quantityStockCurrent > 0", function(err, stock){
+                db.query("SELECT * FROM currency", function(err, currency) {
+                    db.query("SELECT * FROM invoice ORDER BY invoiceNo DESC LIMIT 1", function(err, lastInvoice) {
+                        res.render("admin/newinvoice.ejs", {
+                            vat: vat,
+                            customer: customer,
+                            currency: currency,
+                            stock: stock,
+                            lastInvoice: lastInvoice[0].invoiceNo,
+                            userID: req.user[0],
+                            userFName: req.user[1],
+                            userLName: req.user[2]
+                        });
+                    })
+                })
+            })
+        })
+    });
+});
+
+// New Invoice Post Request
+app.post("/admin/invoices", function(req, res){
+    var lastInvoiceNo = Number(req.body.last_invoiceNo) + 1;
+    var query =     "INSERT INTO invoice (";
+    query +=        "invoice_customerID, invoice_userID, saleVoid, invoiceDate,";
+    query +=        " invoiceDueDate, invoice_vatID, invoiceAdjustments, invoice_currencyID)";
+    query +=        " VALUES ('"+req.body.invoice_customerID+"', '"+req.body.invoice_userID+"',";
+    query +=        " '"+req.body.saleVoid+"', '"+req.body.invoiceDate+"',";
+    query +=        " '"+req.body.invoiceDueDate+"', '"+req.body.invoice_vatID+"',";
+    query +=        " '"+req.body.invoiceAdjustments+"', '"+req.body.invoice_currencyID+"')";
+
+    db.query(query, function(err,result){
+        if(req.body.invoice_stockQty2 < 1) {
+            var query2 = "INSERT INTO invoice_stock (";
+            query2 += "join_invoiceNo, join_stockID, stockQuantity, priceSold)";
+            query2 += " VALUES ('" +lastInvoiceNo+ "', '" + req.body.invoice_stockID1 + "',";
+            query2 += " '" + req.body.invoice_stockQty1 + "', '" + req.body.invoice_stockPrice1 + "')";
+
+            db.query(query2, function(err,result) {
+                var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent - ";
+                query3 +=    "'"+req.body.invoice_stockQty1+"' WHERE stockID = '"+req.body.invoice_stockID1+"'";
+
+                db.query(query3, function(err, result) {
+                    console.log("Invoice Added");
+                    res.redirect("/admin/invoices");
+                })
+            })
+        }else{
+            var query2 = "INSERT INTO invoice_stock (";
+            query2 += "join_invoiceNo, join_stockID, stockQuantity, priceSold)";
+            query2 += " VALUES ('" +lastInvoiceNo+ "', '" + req.body.invoice_stockID1 + "',";
+            query2 += " '" + req.body.invoice_stockQty1 + "', '" + req.body.invoice_stockPrice1 + "'),";
+            query2 += " ('" +lastInvoiceNo+ "', '" + req.body.invoice_stockID2 + "',";
+            query2 += " '" +req.body.invoice_stockQty2+ "', '" + req.body.invoice_stockPrice2 + "')";
+
+            console.log(query2);
+            db.query(query2, function(err,result) {
+                var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent - ";
+                query3 +=    "'"+req.body.invoice_stockQty1+"' WHERE stockID = '"+req.body.invoice_stockID1+"'";
+
+                db.query(query3, function(err, result) {
+                    var query4 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent - ";
+                    query4 +=    "'"+req.body.invoice_stockQty2+"' WHERE stockID = '"+req.body.invoice_stockID2+"'";
+
+                    db.query(query4, function(err, result) {
+                        console.log("Invoice Added");
+                        res.redirect("/admin/invoices");
+                    })
+                })
+            })
+        }
+    })
+});
+
+// Edit Invoice Page
+app.get("/admin/invoices/edit/:id", function(req,res){
+    db.query("SELECT * FROM invoice WHERE invoiceNo = "+ req.params.id, function(err, rows){
+        if(err){
+            console.log("Failed to Update Invoice");
+            res.redirect("/admin/stock")
+        }
+        if(rows.length <= 0){
+            console.log("Failed to Find Invoice");
+            res.redirect("/admin/stock")
+        }
+        else{
+            db.query("SELECT * FROM customer", function(err, customer){
+                db.query("SELECT * FROM vat", function(err, vat){
+                    db.query("SELECT * FROM stock JOIN product ON stock_productID = productID WHERE quantityStockCurrent > 0", function(err, stock){
+                        db.query("SELECT * FROM currency", function(err, currency) {
+                            db.query("SELECT * FROM invoice_stock WHERE join_invoiceNo = "+req.params.id, function(err, invoice_stock) {
+                                res.render("admin/editinvoice.ejs", {
+                                    vat: vat,
+                                    customer: customer,
+                                    currency: currency,
+                                    stock: stock,
+                                    invoice: rows[0],
+                                    invoice_stock: invoice_stock,
+                                    userID: req.user[0],
+                                    userFName: req.user[1],
+                                    userLName: req.user[2]
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        }
+    })
+});
+
+// Update Invoice
+app.post("/admin/invoices/edit", function(req, res){
+    var query =     "UPDATE invoice SET ";
+    query +=        " invoice_customerID = '"+req.body.invoice_customerID+"',";
+    query +=        " saleVoid = '"+req.body.saleVoid+"',";
+    query +=        " invoiceDate = '"+req.body.invoiceDate+"',";
+    query +=        " invoiceDueDate = '"+req.body.invoiceDueDate+"',";
+    query +=        " invoice_vatID = '"+req.body.invoice_vatID+"',";
+    query +=        " invoiceAdjustments = '"+req.body.invoiceAdjustments+"'";
+    query +=        " invoice_currencyID = '"+req.body.invoice_currencyID+"'";
+    query +=        " WHERE invoiceNo = "+req.body.invoiceNo+"";
+
+    db.query(query, function(err,result){
+        if(req.body.invoice_stockQty2 === null) {
+            var query2 =     "UPDATE invoice_stock SET ";
+            query2 +=        " stockQuantity = '"+req.body.invoice_stockQty1+"',";
+            query2 +=        " priceSold = '"+req.body.invoice_stockPrice1+"'";
+            query2 +=        " WHERE join_invoiceNo = "+req.body.invoiceNo+" and join_stockID = "+req.body.invoice_stockID1;
+
+            console.log(query2);
+            db.query(query2, function(err,result) {
+                    console.log("Invoice Updated");
+                    res.redirect("/admin/invoices");
+            })
+        }else{
+            var query2 =     "UPDATE invoice_stock SET ";
+            query2 +=        " stockQuantity = '"+req.body.invoice_stockQty1+"',";
+            query2 +=        " priceSold = '"+req.body.invoice_stockPrice1+"'";
+            query2 +=        " WHERE join_invoiceNo = "+req.body.invoiceNo+" and join_stockID = "+req.body.invoice_stockID1;
+
+            console.log(query2);
+            db.query(query2, function(err,result) {
+                var query3 =     "UPDATE invoice_stock SET ";
+                query3 +=        " stockQuantity = '"+req.body.invoice_stockQty2+"',";
+                query3 +=        " priceSold = '"+req.body.invoice_stockPrice2+"'";
+                query3 +=        " WHERE join_invoiceNo = "+req.body.invoiceNo+" and join_stockID = "+req.body.invoice_stockID2;
+
+                db.query(query3, function(err, result) {
+                        console.log("Invoice Updated");
+                        res.redirect("/admin/invoices");
+                })
+            })
+        }
+    })
+});
 // Get Credit Note Page
 app.get("/admin/creditnotes", function(req, res) {
-    res.render("admin/credit_notes", {userFName: req.user[1],userLName: req.user[2]});
+    var query = "SELECT * FROM credit_note JOIN account ON credit_note.credit_userID = userID JOIN currency ON credit_note.credit_currencyID = currencyID";
+    query +=    " JOIN customer ON credit_note.credit_customerID = customerID JOIN vat ON credit_note.credit_vatID = vatID";
+    query +=    " JOIN credit_stock ON credit_note.creditNo = join_creditNo JOIN stock ON credit_stock.join_stockID = stockID";
+    query +=    " JOIN product ON stock.stock_productID = productID";
+
+    db.query(query, function (err, credit_note) {
+        if (err) {
+            console.log("Error with showing SQL")
+        }
+        else {
+            res.render("admin/credit_notes.ejs", {credit_note:credit_note, userFName: req.user[1],userLName: req.user[2]});
+        }
+    })
+});
+
+// Get New Credit Notes Page
+app.get("/admin/creditnotes/new", function(req, res){
+    db.query("SELECT * FROM customer", function(err, customer){
+        db.query("SELECT * FROM vat", function(err, vat){
+            db.query("SELECT * FROM stock JOIN product ON stock_productID = productID", function(err, stock){
+                db.query("SELECT * FROM currency", function(err, currency) {
+                    db.query("SELECT * FROM credit_note ORDER BY creditNo DESC LIMIT 1", function(err, lastCredit) {
+                        res.render("admin/newcreditnote.ejs", {
+                            vat: vat,
+                            customer: customer,
+                            currency: currency,
+                            stock: stock,
+                            lastCredit: lastCredit[0].creditNo,
+                            userID: req.user[0],
+                            userFName: req.user[1],
+                            userLName: req.user[2]
+                        });
+                    })
+                })
+            })
+        })
+    });
+});
+
+// New Credit Note Post Request
+app.post("/admin/creditnotes", function(req, res){
+    var lastCreditNo = Number(req.body.last_creditNo) + 1;
+    var query =     "INSERT INTO credit_note (";
+    query +=        "credit_customerID, credit_userID, creditDate,";
+    query +=        " creditDueDate, credit_vatID, creditAdjustments, credit_currencyID)";
+    query +=        " VALUES ('"+req.body.credit_customerID+"', '"+req.body.credit_userID+"',";
+    query +=        " '"+req.body.creditDate+"',";
+    query +=        " '"+req.body.creditDueDate+"', '"+req.body.credit_vatID+"',";
+    query +=        " '"+req.body.creditAdjustments+"', '"+req.body.credit_currencyID+"')";
+
+    db.query(query, function(err,result) {
+        var query2 = "INSERT INTO credit_stock (";
+        query2 += "join_creditNo, join_stockID, stockQuantity, priceCredit)";
+        query2 += " VALUES ('" + lastCreditNo + "', '" + req.body.credit_stockID + "',";
+        query2 += " '" + req.body.credit_stockQty + "', '" + req.body.credit_stockPrice + "')";
+
+        console.log(query2);
+        db.query(query2, function (err, result) {
+            var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent + ";
+            query3 += "'" + req.body.credit_stockQty + "' WHERE stockID = '" + req.body.credit_stockID + "'";
+
+            db.query(query3, function (err, result) {
+                console.log("Credit Note Added");
+                res.redirect("/admin/creditnotes");
+            })
+        })
+    });
 });
 
 // Get Offers Page
@@ -475,7 +918,19 @@ app.post("/admin/offers/edit", function(req, res){
 
 // Get Reports Page
 app.get("/admin/reports", function(req, res) {
-    res.render("admin/reports", {userFName: req.user[1],userLName: req.user[2]});
+    db.query("SELECT * FROM invoice JOIN invoice_stock ON invoice.invoiceNo = join_invoiceNo JOIN stock ON invoice_stock.join_stockID = stockID JOIN currency ON invoice.invoice_currencyID = currencyID JOIN account ON invoice.invoice_userID = userID", function(err,invoice){
+        db.query("SELECT * FROM credit_note JOIN credit_stock ON credit_note.creditNo = join_creditNo JOIN stock ON credit_stock.join_stockID = stockID JOIN currency ON credit_note.credit_currencyID = currencyID JOIN account ON credit_note.credit_userID = userID", function(err,credit_note){
+            db.query("SELECT * FROM stock JOIN currency ON stock.stock_currencyID = currencyID", function(err, stock) {
+                res.render("admin/reports", {
+                    invoice: invoice,
+                    credit_note: credit_note,
+                    stock:stock,
+                    userFName: req.user[1],
+                    userLName: req.user[2]
+                });
+            })
+        })
+    })
 });
 
 // Get Users Page
@@ -761,5 +1216,5 @@ app.post("/admin/positions/edit", function(req, res){
 
 // Start Server on Port 3000
 app.listen(3000, process.env.IP, function(){
-    console.log("The Server Has Started.");
+    console.log("The Server Has Started on Port 3000.");
 });

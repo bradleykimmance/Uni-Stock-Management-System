@@ -1,0 +1,126 @@
+<% include ../partials/adminHeader %>
+
+<div class="wrapper">
+
+    <nav id="sidebar">
+        <!-- Sidebar Links -->
+        <ul class="list-unstyled components">
+            <li><a href="/admin/home">Dashboard</a></li>
+            <li><a href="/admin/customers">Customers</a></li>
+            <li><a href="/admin/stock">Stock</a></li>
+            <li class="active"><a href="/admin/invoices">Invoices</a></li>
+            <li><a href="/admin/creditnotes">Credit Notes</a></li>
+            <li><a href="/admin/offers">Offers</a></li>
+            <li><a href="/admin/reports">Reports</a></li>
+            <li><a href="/admin/users">Users</a></li>
+            <li><a href="/admin/currencies">Currencies</a></li>
+            <li><a href="/admin/products">Products</a></li>
+            <li><a href="/admin/positions">Positions</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <header class="jumbotron">
+            <div class="container">
+                <h1>New Invoice</h1>
+            </div>
+        </header>
+
+
+    <form class = "form-center" action="/admin/invoices" method="POST">
+        <input type="hidden" name="last_invoiceNo" value="<%= lastInvoice %>">
+        <div class="form-group row">
+            <input type="hidden" name="invoice_userID" value="<%= userID %>">
+            <input type="hidden" name="saleVoid" value="0">
+            <label for="invoice_customerID" class="col-2 col-form-label">Select Customer:</label>
+            <div class="col-4">
+                <select class="form-control" name="invoice_customerID" required>
+                    <option disabled selected value></option>
+                    <% customer.forEach(function(customer){ %>
+                    <option value ="<%= customer.customerID%>"> <%= customer.customerBusiness%> </option>
+                    <%})%>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="invoiceDate" class="col-2 col-form-label">Invoice Date:</label>
+            <div class="col-4">
+                <input type="date" class="form-control" name = "invoiceDate" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="invoiceDueDate" class="col-2 col-form-label">Invoice Due Date:</label>
+            <div class="col-4">
+                <input type="date" class="form-control" name = "invoiceDueDate" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="invoice_currencyID" class="col-2 col-form-label">Select Currency:</label>
+            <div class="col-4">
+                <select class="form-control" name="invoice_currencyID" required>
+                    <option disabled selected value></option>
+                    <% currency.forEach(function(currency){ %>
+                    <option value ="<%= currency.currencyID%>" > <%= currency.currencyName%> </option>
+                    <%})%>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="invoice_stockID1" class="col-2 col-form-label">Select Stock 1:</label>
+            <div class="col-4">
+                <select class="form-control" name="invoice_stockID1" required>
+                    <option disabled selected value></option>
+                    <% stock.forEach(function(stock){ %>
+                    <option value ="<%= stock.stockID%>"> <%= stock.productName%> - <%= stock.quantityStockCurrent%> </option>
+                    <%})%>
+                </select>
+            </div>
+            <label for="invoice_stockQty1" class="col-2 col-form-label">Quantity:</label>
+            <div class="col-4">
+                <input type="number" class="form-control" name = "invoice_stockQty1" required>
+            </div>
+            <label for="invoice_stockPrice1" class="col-2 col-form-label">Price:</label>
+            <div class="col-4">
+                <input type="number" step="0.01" class="form-control" name = "invoice_stockPrice1" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="invoice_stockID2" class="col-2 col-form-label">Select Stock 2:</label>
+            <div class="col-4">
+                <select class="form-control" name="invoice_stockID2">
+                    <option disabled selected value></option>
+                    <% stock.forEach(function(stock){ %>
+                    <option value ="<%= stock.stockID%>"> <%= stock.productName%> - <%= stock.quantityStockCurrent%> </option>
+                    <%})%>
+                </select>
+            </div>
+            <label for="invoice_stockQty2" class="col-2 col-form-label">Quantity:</label>
+            <div class="col-4">
+                <input type="number" class="form-control" name = "invoice_stockQty2">
+            </div>
+            <label for="invoice_stockPrice2" class="col-2 col-form-label">Price:</label>
+            <div class="col-4">
+                <input type="number" step="0.01" class="form-control" name = "invoice_stockPrice2">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="invoice_vatID" class="col-2 col-form-label">VAT Rate:</label>
+            <div class="col-4">
+                <select class="form-control" name="invoice_vatID" required>
+                    <option disabled selected value></option>
+                    <% vat.forEach(function(vat){ %>
+                    <option value ="<%= vat.vatID%>"> <%= vat.vatRate%> </option>
+                    <%})%>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="invoiceAdjustments" class="col-2 col-form-label">Adjustments:</label>
+            <div class="col-4">
+                <input type="number" step="0.01" class="form-control" value = "0" name = "invoiceAdjustments" required>
+            </div>
+        </div>
+        <button class = "button button-primary button-form">Submit!</button>
+    </form>
+
+
+<% include ../partials/footer %>

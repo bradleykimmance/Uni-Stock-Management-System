@@ -22,4 +22,25 @@
             </div>
         </header>
 
+        <table class="generalTable">
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Currency</th>
+                <th>Cost</th>
+                <th>Date Offered</th>
+                <th>Offered By</th>
+            </tr>
+            <% offer.forEach(function(offer){ %>
+            <tr>
+                <td><%=offer.productName%></td>
+                <td><%=offer.quantityOffer%></td>
+                <td><%=offer.currencyName%></td>
+                <td><%=offer.priceOffer%></td>
+                <td><%=('0' + offer.dateOffer.getDate()).slice(-2) +'/'+ ('0' + (offer.dateOffer.getMonth()+1)).slice(-2) +'/'+ offer.dateOffer.getFullYear()%></td>
+                <td><%=offer.customerBusiness%></td>
+            </tr>
+            <% }) %>
+        </table>
+
 <% include ../partials/footer %>

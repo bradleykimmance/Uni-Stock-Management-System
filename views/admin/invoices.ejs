@@ -25,5 +25,62 @@
                 <h1>Invoices</h1>
             </div>
         </header>
+        <p>
+            <a class = "button button-primary" href ="/admin/invoices/new">Add New Invoice</a>
+        </p>
 
+        <table class="generalTable">
+            <tr>
+                <th>Invoice Number</th>
+                <th>Customer</th>
+                <th>Invoice Date</th>
+                <th>Currency</th>
+                <th>Stock</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>VAT</th>
+                <th>Adjustments</th>
+                <th>Total</th>
+                <th>Total Inc VAT</th>
+                <th>Void?</th>
+                <th>Sale By</th>
+            </tr>
+            <% var invoiceID = 0 %>
+            <% invoice.forEach(function(invoice){ %>
+            <% if(invoiceID === invoice.invoiceNo){%>
+
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><%= invoice.productName%></td>
+            <td><%= invoice.stockQuantity%></td>
+            <td><%= invoice.priceSold%></td>
+            <td><%= invoice.vatRate * invoice.priceSold %></td>
+            <td></td>
+            <td><%= +((invoice.stockQuantity * invoice.priceSold) - invoice.invoiceAdjustments)%></td>
+            <td><%= +((invoice.stockQuantity * invoice.priceSold)+(invoice.vatRate * invoice.priceSold * invoice.stockQuantity)- invoice.invoiceAdjustments)%></td>
+            <td></td>
+            <td></td>
+
+            <% }else{%>
+            <tr>
+                <td><%=invoice.invoiceNo%></td>
+                <td><%=invoice.customerBusiness%></td>
+                <td><%=('0' + invoice.invoiceDate.getDate()).slice(-2) +'/'+ ('0' + (invoice.invoiceDate.getMonth()+1)).slice(-2) +'/'+ invoice.invoiceDate.getFullYear()%></td>
+                <td><%=invoice.currencyName%></td>
+                <td><%=invoice.productName%></td>
+                <td><%=invoice.stockQuantity%></td>
+                <td><%=invoice.priceSold%></td>
+                <td><%= invoice.vatRate * invoice.priceSold %></td>
+                <td><%=invoice.invoiceAdjustments%></td>
+                <td><%=((invoice.stockQuantity * invoice.priceSold) - invoice.invoiceAdjustments)%></td>
+                <td><%=((invoice.stockQuantity * invoice.priceSold)+(invoice.vatRate * invoice.priceSold * invoice.stockQuantity)- invoice.invoiceAdjustments)%></td>
+                <td><%=invoice.saleVoid%></td>
+                <td><%=invoice.fName%></td>
+            </tr>
+            <%}%>
+            <% invoiceID = invoice.invoiceNo %>
+            <% }) %>
+        </table>
 <% include ../partials/footer %>

@@ -26,4 +26,40 @@
             </div>
         </header>
 
+        <p>
+            <a class = "button button-primary" href ="/admin/creditnotes/new">Add New Credit Note</a>
+        </p>
+
+        <table class="generalTable">
+            <tr>
+                <th>Credit Number</th>
+                <th>Customer</th>
+                <th>Credit Date</th>
+                <th>Currency</th>
+                <th>Stock</th>
+                <th>Quantity</th>
+                <th>Credit</th>
+                <th>VAT</th>
+                <th>Adjustments</th>
+                <th>Total</th>
+                <th>Total Inc VAT</th>
+                <th>Credit By</th>
+            </tr>
+            <% credit_note.forEach(function(credit_note){ %>
+            <tr>
+                <td><%=credit_note.creditNo%></td>
+                <td><%=credit_note.customerBusiness%></td>
+                <td><%=('0' + credit_note.creditDate.getDate()).slice(-2) +'/'+ ('0' + (credit_note.creditDate.getMonth()+1)).slice(-2) +'/'+ credit_note.creditDate.getFullYear()%></td>
+                <td><%=credit_note.currencyName%></td>
+                <td><%=credit_note.productName%></td>
+                <td><%=credit_note.stockQuantity%></td>
+                <td><%=credit_note.priceCredit%></td>
+                <td><%= credit_note.vatRate * credit_note.priceCredit %></td>
+                <td><%=credit_note.creditAdjustments%></td>
+                <td><%=((credit_note.stockQuantity * credit_note.priceCredit) - credit_note.creditAdjustments)%></td>
+                <td><%=((credit_note.stockQuantity * credit_note.priceCredit)+(credit_note.vatRate * credit_note.priceCredit * credit_note.stockQuantity)- credit_note.creditAdjustments)%></td>
+                <td><%=credit_note.fName%></td>
+            </tr>
+            <%})%>
+        </table>
 <% include ../partials/footer %>
