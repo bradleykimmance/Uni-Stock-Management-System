@@ -142,9 +142,9 @@ a, a:hover, a:focus {
 .totalTable{
     border-collapse: collapse;
     width: 20%;
-    position: absolute;
-    bottom:75px;
-    margin-left:25%;
+    position: relative;
+    margin-left:40%;
+    clear: both;
 }
 
 .totalTable td, .reportTable th {

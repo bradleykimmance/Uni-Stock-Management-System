@@ -329,7 +329,6 @@ app.post("/creditnotes", function(req, res){
         query2 += " VALUES ('" + lastCreditNo + "', '" + req.body.credit_stockID + "',";
         query2 += " '" + req.body.credit_stockQty + "', '" + req.body.credit_stockPrice + "')";
 
-        console.log(query2);
         db.query(query2, function (err, result) {
             var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent + ";
             query3 += "'" + req.body.credit_stockQty + "' WHERE stockID = '" + req.body.credit_stockID + "'";
@@ -423,7 +422,6 @@ app.post("/admin/customers", function(req, res){
     query +=        ", '"+req.body.customerVAT+"', '"+req.body.customerEmail+"'";
     query +=        ", '"+req.body.customerEmailCC+"', '"+req.body.customerPhone+"')";
 
-    console.log(query);
     db.query(query, function(err,result){
         console.log("Customer Added");
         res.redirect("/admin/customers");
@@ -579,7 +577,7 @@ app.get("/admin/invoices", function(req, res) {
     var query =     "SELECT * FROM invoice JOIN account ON invoice.invoice_userID = userID JOIN currency ON invoice.invoice_currencyID = currencyID";
         query +=    " JOIN customer ON invoice.invoice_customerID = customerID JOIN vat ON invoice.invoice_vatID = vatID";
         query +=    " JOIN invoice_stock ON invoice.invoiceNo = join_invoiceNo JOIN stock ON invoice_stock.join_stockID = stockID";
-        query +=    " JOIN product ON stock.stock_productID = productID";
+        query +=    " JOIN product ON stock.stock_productID = productID ORDER BY invoice.invoiceNo DESC";
 
     db.query(query, function (err, invoice) {
         if (err) {
@@ -650,7 +648,6 @@ app.post("/admin/invoices", function(req, res){
             query2 += " ('" +lastInvoiceNo+ "', '" + req.body.invoice_stockID2 + "',";
             query2 += " '" +req.body.invoice_stockQty2+ "', '" + req.body.invoice_stockPrice2 + "')";
 
-            console.log(query2);
             db.query(query2, function(err,result) {
                 var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent - ";
                 query3 +=    "'"+req.body.invoice_stockQty1+"' WHERE stockID = '"+req.body.invoice_stockID1+"'";
@@ -725,7 +722,6 @@ app.post("/admin/invoices/edit", function(req, res){
             query2 +=        " priceSold = '"+req.body.invoice_stockPrice1+"'";
             query2 +=        " WHERE join_invoiceNo = "+req.body.invoiceNo+" and join_stockID = "+req.body.invoice_stockID1;
 
-            console.log(query2);
             db.query(query2, function(err,result) {
                     console.log("Invoice Updated");
                     res.redirect("/admin/invoices");
@@ -736,7 +732,6 @@ app.post("/admin/invoices/edit", function(req, res){
             query2 +=        " priceSold = '"+req.body.invoice_stockPrice1+"'";
             query2 +=        " WHERE join_invoiceNo = "+req.body.invoiceNo+" and join_stockID = "+req.body.invoice_stockID1;
 
-            console.log(query2);
             db.query(query2, function(err,result) {
                 var query3 =     "UPDATE invoice_stock SET ";
                 query3 +=        " stockQuantity = '"+req.body.invoice_stockQty2+"',";
@@ -756,7 +751,7 @@ app.get("/admin/creditnotes", function(req, res) {
     var query = "SELECT * FROM credit_note JOIN account ON credit_note.credit_userID = userID JOIN currency ON credit_note.credit_currencyID = currencyID";
     query +=    " JOIN customer ON credit_note.credit_customerID = customerID JOIN vat ON credit_note.credit_vatID = vatID";
     query +=    " JOIN credit_stock ON credit_note.creditNo = join_creditNo JOIN stock ON credit_stock.join_stockID = stockID";
-    query +=    " JOIN product ON stock.stock_productID = productID";
+    query +=    " JOIN product ON stock.stock_productID = productID ORDER BY credit_note.creditNo DESC";
 
     db.query(query, function (err, credit_note) {
         if (err) {
@@ -809,7 +804,6 @@ app.post("/admin/creditnotes", function(req, res){
         query2 += " VALUES ('" + lastCreditNo + "', '" + req.body.credit_stockID + "',";
         query2 += " '" + req.body.credit_stockQty + "', '" + req.body.credit_stockPrice + "')";
 
-        console.log(query2);
         db.query(query2, function (err, result) {
             var query3 = "UPDATE stock SET quantityStockCurrent = quantityStockCurrent + ";
             query3 += "'" + req.body.credit_stockQty + "' WHERE stockID = '" + req.body.credit_stockID + "'";
@@ -964,7 +958,6 @@ app.post("/admin/users", function(req,res){
     query +=        ", '"+req.body.email+"', '"+encPassword+"'";
     query +=        ", '"+req.body.registerDate+"', '"+req.body.user_positionID+"', '"+req.body.adminID+"')";
 
-    console.log(query);
     db.query(query, function(err,result){
         console.log("User Added");
         res.redirect("/admin/users");
